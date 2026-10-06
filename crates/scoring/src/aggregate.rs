@@ -109,6 +109,11 @@ struct Acc {
 
 impl Acc {
     /// 把一局中「某个队伍」的观测值加入桶。
+    ///
+    /// 参数多是有意的：这些量全部来自同一局的同一次归一化计算（得分、占比、击杀、死亡、
+    /// 击杀比、tick），拆成结构体会让调用点每次都要先拼一个只用一次的对象，反而更难读。
+    /// 本函数是私有实现细节，不对外暴露，因此这里显式允许 clippy 的 `too_many_arguments`。
+    #[allow(clippy::too_many_arguments)]
     fn observe(
         &mut self,
         outcome: Outcome,
@@ -235,6 +240,10 @@ pub fn aggregate(
         // 本局全场总分：用于把每队得分归一成「占比」。
         let total_score: i64 = result.scores.iter().map(|&s| i64::from(s)).sum();
 
+        // `team` 不只是下标：它同时是 `TeamId`、`rule.outcome` 与 `ai_name_of` 的入参，
+        // 而且循环上界来自**本局结果**（`team_total`）而不是 `by_slot` 的长度，
+        // 所以不能改成 `by_slot.iter().enumerate()`（结果队伍数少于报告槽位数时会漏算 AI 榜）。
+        #[allow(clippy::needless_range_loop)]
         for team in 0..team_total {
             let team_id = team as TeamId;
             let outcome = rule.outcome(result, team_id);

@@ -4,11 +4,20 @@
 > 任何格式变更都属于**协议变更**：必须升版本号、更新本文档、双方同步。
 > 发现接口问题只在本文档或代码注释里提出，**不要擅自改协议**。
 
-- 契约版本：`engine_version = 1`，`rules_version = 1`，`map_gen_version = 1`
+- 契约版本：`engine_version = 1`，`rules_version = 2`，`map_gen_version = 1`
+  - 版本历史（**只增不改**，改动必须留痕，方便第三方复算旧回放）：
+    - `engine_version 1` / `rules_version 1` / `map_gen_version 1`：首个可用版本。
+    - `rules_version 2`：虚空从「不可通行」改为「**可进入但立即死亡**」。
+      **JSON 结构与字段含义没有任何变化**（地形编码表、事件类型集合、单位/旗/炸弹字段全部照旧），
+      变化的是「数据代表的规则」，因此只升 `rules_version`、不升 `engine_version`：
+      解析器无需分支，但**分数/结果不可与 version 1 的回放直接比较**（同一局面下 AI 的合法动作集变了）。
+      这也是版本号三件套的用途：看 `rules_version` 决定要不要比较结果，看 `engine_version` 决定要不要换解析器。
 - 数据结构定义处：`crates/protocol/src/{types,view,replay,result}.rs`（Rust 侧唯一真源）
 - 校验工具：`tools/validate_replay.py`（Python，对任意 `.jsonl` 回放做结构校验）
-- 手写样例：`samples/demo_2teams.jsonl`、`samples/demo_3teams.jsonl`（供 Web UI 开发期使用，
-  由 `tools/make_demo_replay.py` 生成；真实回放由 `cli run --out <dir>` 产出到 `<dir>/replays/`）
+- 手写样例：`samples/demo_2p.jsonl`、`samples/demo_3p.jsonl`（供 Web UI 开发期使用，
+  由 `tools/make_demo_replay.py` 生成；真实回放由 `cli run --out <dir>` 产出到 `<dir>/replays/`。
+  另有 `samples/malformed.jsonl`（畸形行容错）与 `samples/version_mismatch.jsonl`（版本不匹配警告），
+  两者也是 Web UI 的容错测试素材）
 
 ---
 
@@ -46,7 +55,7 @@
 {
   "type": "init",
   "engine_version": 1,
-  "rules_version": 1,
+  "rules_version": 2,
   "map_gen_version": 1,
   "map": {
     "width": 5,
@@ -101,7 +110,9 @@
 
 - `Empty`：可通行、可放炸弹、旗可以刷/掉在这里。
 - `Wall`：阻挡移动、**阻挡视线**、**阻挡炸弹十字爆炸的继续传播**。
-- `Void`：不可通行、不可放置任何东西、旗不会掉在这里；**不阻挡视线**（当前规则）。
+- `Void`：**可进入，但进入即死**（`rules_version >= 2`，见 `docs/rules.md` §1/§9）。不可放置任何东西、
+  旗不会掉在这里、不会在这里复活；**不阻挡视线**、**不阻挡爆炸**。
+  UI 表现建议：画成「深色深渊」而不是「实心墙」，这样观众能从画面区分「走不进去的墙」和「走进去会死的虚空」。
 - `TeamBase`：出生点/复活点/得分区；敌方单位不能进入；禁止放炸弹；格内单位免疫爆炸伤害。
 
 > Web UI 侧注意：地形编码超出 `0..=6` 时按「未知地形」兜底（按 `Empty` 渲染 + 控制台警告），不要抛异常。
@@ -236,6 +247,8 @@ tick 12 · 移动冲突：单位 [1,4] 同时想进入 (5,5)，双方留在原�
 - 三个版本号在 `manifest.json`、`summary.json`、回放 `init` 行**三处都必须存在**。
 - Web UI 解析策略：
   - `map_gen_version` 不是已知版本（当前为 `1`）→ **显示警告横幅**，仍尽量渲染（地形编码按本表解释）。
+  - `rules_version` 高于已知版本（当前为 `2`）→ 同样只警告不拒绝：UI 只画数据，不重算规则，
+    所以「规则更新」对渲染不构成障碍，但要在信息面板里注明「规则版本较新，结果解释可能有出入」。
   - `engine_version` / `rules_version` 高于 UI 已知版本 → 警告「回放可能包含本 UI 不认识的规则/事件」，
     跳过不认识的事件类型，继续渲染。
   - `map.terrain` 长度与 `width*height` 不符 → 警告 + 用 `Empty` 补齐缺失部分（不要崩溃）。
@@ -253,7 +266,7 @@ tick 12 · 移动冲突：单位 [1,4] 同时想进入 (5,5)，双方留在原�
 > 引擎永远不会生成它；写解析器时不要把它当成合法性判据。
 
 ```text
-{"type":"init","engine_version":1,"rules_version":1,"map_gen_version":1,"map":{"width":5,"height":5,"map_gen_version":1,"terrain":[3,3,3,1,2,3,3,3,0,0,3,3,3,0,1,0,0,0,0,0,1,0,4,4,4]},"teams":[{"team_id":0,"ai_name":"random","base_x":0,"base_y":0},{"team_id":1,"ai_name":"defender","base_x":2,"base_y":4}],"max_ticks":300,"flag_spawn_interval":5,"center_radius":4,"seed":42}
+{"type":"init","engine_version":1,"rules_version":2,"map_gen_version":1,"map":{"width":5,"height":5,"map_gen_version":1,"terrain":[3,3,3,1,2,3,3,3,0,0,3,3,3,0,1,0,0,0,0,0,1,0,4,4,4]},"teams":[{"team_id":0,"ai_name":"random","base_x":0,"base_y":0},{"team_id":1,"ai_name":"defender","base_x":2,"base_y":4}],"max_ticks":300,"flag_spawn_interval":5,"center_radius":4,"seed":42}
 {"type":"frame","tick":1,"scores":[0,0],"units":[],"flags":[],"bombs":[],"events":[]}
 {"type":"frame","tick":2,"scores":[1,0],"units":[],"flags":[],"bombs":[],"events":[{"type":"score","team":0,"unit":0,"flag":0,"new_score":1}]}
 {"type":"end","match_index":0,"seed":42,"map_gen_version":1,"ticks":2,"scores":[1,0],"kills":[0,0],"deaths":[0,0],"winner":0,"ai_names":["random","defender"]}

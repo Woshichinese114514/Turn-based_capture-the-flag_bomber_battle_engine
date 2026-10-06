@@ -98,7 +98,7 @@ stage3() {
   # 显式带上 --expect-* 三件套。原因：不带期望值时验证器只检查「回放自身结构自洽」，
   # 而「本次交付必须是 1/1/1」是另一条独立契约——版本号写错但内部一致，它看不见。
   python3 tools/validate_replay.py \
-    --expect-engine 1 --expect-rules 1 --expect-map-gen 1 \
+    --expect-engine 1 --expect-rules 2 --expect-map-gen 1 \
     samples/demo_2p.jsonl \
     "$ARTIFACT_DIR"/run2p/replays/*.jsonl \
     "$ARTIFACT_DIR"/run3p/replays/*.jsonl
@@ -107,7 +107,7 @@ stage3() {
   # 只有「拿期望版本去比」才能发现它（这正是真实使用场景：CLI 侧知道自己该是什么版本）。
   for bad in samples/version_mismatch.jsonl samples/malformed.jsonl; do
     if python3 tools/validate_replay.py --quiet \
-      --expect-engine 1 --expect-rules 1 --expect-map-gen 1 "$bad"; then
+      --expect-engine 1 --expect-rules 2 --expect-map-gen 1 "$bad"; then
       echo "验证器未能识别故意构造的坏样例：$bad" >&2
       return 1
     fi

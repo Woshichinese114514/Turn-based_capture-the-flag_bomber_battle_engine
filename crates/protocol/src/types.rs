@@ -141,7 +141,15 @@ pub enum Terrain {
     Empty,
     /// 墙：阻挡移动、阻挡视线、阻挡（挡住）炸弹十字爆炸的继续传播。
     Wall,
-    /// 虚空：不可通行、不可放置任何东西；旗不会掉在这里。
+    /// 虚空（深坑）：**可以走进去，但踏上去的单位立刻死亡**（掉入虚空）。
+    ///
+    /// 它与墙的差别是有意为之，也是规则里最容易混淆的一对：
+    /// * 墙：**挡住**移动，也**挡住**炸弹爆炸的十字传播；单位不会因为撞墙而死。
+    /// * 虚空：**不挡**移动、**不挡**爆炸传播、不挡视线；代价是站点本身致命。
+    ///
+    /// 因此「能不能站人」有两个不同的问题，协议层给两个谓词：
+    /// [`Terrain::is_walkable`]（安全可站立）与 [`Terrain::can_be_entered`]（移动层面可进入）。
+    /// `sim` 的移动判定用后者，刷旗/掉旗/复活等「必须安全落地」的判定用前者。
     Void,
     /// 阵营格：出生点 / 复活点 / 得分区，携带 `team_id`。
     TeamBase(TeamId),
@@ -172,12 +180,35 @@ impl Terrain {
         }
     }
 
-    /// 该地形上是否可以站人（空地或任意阵营格）。
+    /// 该地形上是否可以**安全**站人（空地或任意阵营格）。
+    ///
+    /// 「安全」二字是关键：虚空虽然能走进去，但进去就死，所以它**不是**可站立地形。
+    /// 刷旗候选格、掉旗候选格、复活点选择都应当用本函数（绝不能让旗或单位落在会致死的地形上）。
     ///
     /// 注意：这只考虑**地形本身**，不考虑「敌方阵营不能进入」「格子上有别的单位」等规则；
     /// 那些属于 `sim` 的判定，协议层故意不管，避免两边逻辑分叉。
     pub const fn is_walkable(self) -> bool {
         matches!(self, Terrain::Empty | Terrain::TeamBase(_))
+    }
+
+    /// 移动层面是否可以进入该格（空地、阵营格、**以及虚空**）。
+    ///
+    /// 虚空返回 `true`：单位可以踏上去，然后在下一次「虚空致死」检查里死亡。
+    /// 这不是笔误——规则要求虚空与墙行为不同（docs/rules.md §1）：
+    /// 墙在移动层就被拒绝（`illegal_action`、不消耗 AP），虚空则允许进入（消耗 AP）并致死。
+    /// 判定顺序上「先落地、再死亡」还带来两个可观察后果：
+    /// 1. 掉入虚空的单位本 tick 的 `unit_moved` 事件照常产生；
+    /// 2. 它当 tick 已经花掉的 AP 不会退回。
+    pub const fn can_be_entered(self) -> bool {
+        matches!(self, Terrain::Empty | Terrain::TeamBase(_) | Terrain::Void)
+    }
+
+    /// 该地形是否会杀死踏上去的单位（当前只有虚空）。
+    ///
+    /// 单独成函数而不是让 `sim` 写 `matches!(t, Terrain::Void)`：
+    /// 将来若加入「熔岩」之类的地形，只要改这里一处。
+    pub const fn is_lethal(self) -> bool {
+        matches!(self, Terrain::Void)
     }
 
     /// 该地形是否阻挡视线。
@@ -315,8 +346,23 @@ impl MapInit {
     }
 
     /// 该格是否可站立（地形层面，不含单位/阵营规则）。
+    ///
+    /// 「可站立」= 安全落地，虚空不算（走进去会死）。详见 [`Terrain::is_walkable`]。
     pub fn is_walkable(&self, x: i32, y: i32) -> bool {
         self.terrain_at(x, y).is_some_and(Terrain::is_walkable)
+    }
+
+    /// 该格在移动层面是否可进入（含虚空；越界不可进入）。
+    ///
+    /// `sim` 的移动合法性判定用本函数；Web UI 若要做「点击格子预览危险」也可以用它区分
+    /// 「可走」「会死」「走不了」三态。
+    pub fn can_enter(&self, x: i32, y: i32) -> bool {
+        self.terrain_at(x, y).is_some_and(Terrain::can_be_entered)
+    }
+
+    /// 该格是否致命（虚空）。用于回放校验与 UI 的「危险格」提示。
+    pub fn is_lethal(&self, x: i32, y: i32) -> bool {
+        self.terrain_at(x, y).is_some_and(Terrain::is_lethal)
     }
 
     /// 该格是否阻挡视线（地形层面）。越界视为阻挡，防止射线判定泄漏到地图外。
@@ -349,6 +395,36 @@ impl MapInit {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn terrain_entry_and_lethality_are_separate_concepts() {
+        // 「能进入」与「能安全站人」是两件事：虚空能进但不能站（进去了会死）。
+        // 这个测试把三态（可走 / 会死 / 走不了）钉死在协议层，避免以后有人
+        // 图省事把 is_walkable 当成移动合法性判定用掉。
+        assert!(Terrain::Empty.can_be_entered() && Terrain::Empty.is_walkable());
+        assert!(!Terrain::Empty.is_lethal());
+
+        assert!(Terrain::Void.can_be_entered(), "虚空可以走进去");
+        assert!(!Terrain::Void.is_walkable(), "虚空不是安全落点");
+        assert!(Terrain::Void.is_lethal(), "踏上去必死");
+
+        assert!(!Terrain::Wall.can_be_entered(), "墙在移动层就被拒绝");
+        assert!(!Terrain::Wall.is_walkable() && !Terrain::Wall.is_lethal());
+
+        let base = Terrain::TeamBase(1);
+        assert!(base.can_be_entered() && base.is_walkable() && !base.is_lethal());
+
+        // MapInit 的同名快捷方法（回放校验/UI 都用它，避免各处重复写 terrain_at 组合）。
+        let map = MapInit {
+            width: 2,
+            height: 1,
+            map_gen_version: 1,
+            terrain: vec![Terrain::Void, Terrain::Wall],
+        };
+        assert!(map.can_enter(0, 0) && map.is_lethal(0, 0) && !map.is_walkable(0, 0));
+        assert!(!map.can_enter(1, 0) && !map.is_lethal(1, 0));
+        assert!(!map.can_enter(9, 0) && !map.is_lethal(9, 0), "越界既不进入也不致命");
+    }
 
     #[test]
     fn terrain_codes_round_trip() {

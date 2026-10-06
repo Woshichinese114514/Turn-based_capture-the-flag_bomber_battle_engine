@@ -431,6 +431,14 @@ impl<'a> UnitPlan<'a> {
         self.unit.pos
     }
 
+    /// 已规划动作全部成功后的位置（没有规划移动时即原始位置）。
+    ///
+    /// 拾旗/攻击的合法性都以这个位置为准——引擎的结算顺序是「移动 → 攻击 → 炸弹 → 拾旗」，
+    /// 所以移动成功时后续动作发生在 `planned_pos`，移动失败时发生在 `original_pos`。
+    pub fn planned_pos(&self) -> Coord {
+        self.pos_now
+    }
+
     /// 剩余 AP。
     pub fn ap_left(&self) -> u32 {
         self.ap
@@ -576,6 +584,32 @@ impl<'a> UnitPlan<'a> {
             return false;
         }
         let flag = ground_flag_at(obs, self.unit.pos).unwrap_or(0);
+        self.actions.push(Action::PickFlag);
+        self.ap -= 1;
+        self.has_pick = true;
+        self.pick_target = Some(flag);
+        true
+    }
+
+    /// 「先走一步、再拾起目的地那面旗」：本 tick 已规划移动，且**移动后的格子**上正好有一面地上旗。
+    ///
+    /// 为什么值得单独开一个方法（而不是让 [`UnitPlan::can_pick`] 放宽）：
+    /// * 引擎结算顺序是「移动 → … → 拾旗」，所以只要移动成功，拾旗就发生在**新位置**上，
+    ///   `try_pick` 那种「原地拾旗」的保守要求（两个位置踩同一面旗）在这里是多余的；
+    /// * 但风险确实存在：如果移动**失败**（例如目标格同时被对手请求 → `move_conflict`），
+    ///   单位会留在原地，而原地没有旗 → 产生一条 `illegal_action`。
+    ///   所以调用方（`greedy_flag`）只在「目的地附近没有敌人」时才使用本方法；
+    ///   这里再用 `move_is_legal` 会复核的事实兜一层：`pick_target` 一旦设置，
+    ///   移动的合法性判定就要求目的地仍是同一面旗。
+    ///
+    /// 返回 `false` 表示条件不成立（没有移动、AP 不够、目的地没旗、已经规划过拾旗等）。
+    pub fn try_pick_after_move(&mut self, obs: &Observation) -> bool {
+        if self.has_pick || !self.has_move || self.ap == 0 || self.unit.carrying_flag.is_some() {
+            return false;
+        }
+        let Some(flag) = ground_flag_at(obs, self.pos_now) else {
+            return false;
+        };
         self.actions.push(Action::PickFlag);
         self.ap -= 1;
         self.has_pick = true;

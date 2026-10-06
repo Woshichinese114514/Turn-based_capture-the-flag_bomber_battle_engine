@@ -163,7 +163,9 @@
         var r = gridRect(x, y);
 
         if (kind === 'void') {
-          // 虚空：最深的底色（不画网格线），表示完全不可进入。
+          // 虚空：最深的底色（不画网格线），表示「深渊」——注意规则上它是**可以走进去**的，
+          // 走进去的单位同一 tick 就死（rules_version >= 2）。所以这里刻意画得比墙更暗、
+          // 且不带实体块的边缘，视觉上区分「进不去的墙」与「进得去但会死的坑」。
           ctx.fillStyle = COLORS.voidBg;
           ctx.fillRect(r.x, r.y, r.w, r.h);
           ctx.strokeStyle = '#0d1219';

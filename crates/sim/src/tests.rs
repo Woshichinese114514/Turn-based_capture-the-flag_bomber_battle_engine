@@ -396,6 +396,70 @@ fn dead_unit_respawns_on_tenth_tick_in_own_base() {
     );
 }
 
+/// §14-16 回归（用户可见问题）：**建局与复活都必须发生在己方阵营 3×3 之内**。
+///
+/// 与上面的复活测试互补：上面用的是手工 `flat_map`，只能验证「结算函数本身没问题」；
+/// 这里刻意走**真实地图生成器**，因为用户看到的现象（截图里橙队三个单位站在阵营区正上
+/// 方一行）只可能出现在真实布局里。断言的坐标来源也换成 `MapData::in_base`，
+/// 保证与规则、与 `mapgen` 的阵营布局完全同源（自己算 `base.x + dx` 反而会掩盖不一致）。
+#[test]
+fn initial_and_respawn_positions_are_inside_own_base_on_generated_maps() {
+    let rules = RulesConfig::default();
+    for (teams, seed) in [(2u8, 20_240_501u64), (3, 7), (3, 99)] {
+        let spec = mapgen::MapSpec {
+            seed,
+            teams,
+            ..mapgen::MapSpec::default()
+        };
+        let map = mapgen::generate(&spec).expect("默认规格（25×25）地图必须能生成");
+        let mut state = GameState::new(teams, &rules, &map);
+
+        // ① 建局的初始站位。
+        assert_eq!(
+            state.units().len(),
+            teams as usize * rules.units_per_team as usize,
+            "每队应有 {} 个单位",
+            rules.units_per_team
+        );
+        for unit in state.units() {
+            assert!(
+                map.in_base(unit.team, unit.pos.x, unit.pos.y),
+                "队伍 {} 的单位 {} 初始在 {:?}，不在己方阵营（左上角 {:?}）",
+                unit.team,
+                unit.id,
+                unit.pos,
+                map.base_of(unit.team)
+            );
+        }
+
+        // ② 每个单位单独死亡 → 推进到复活 → 复活点也必须在己方阵营内。
+        //    逐单位处理而不是一次全杀：一次全杀会让 9 格阵营里同时挤 3 个待复活单位，
+        //    虽然规则允许（顺序复活），但断言会变复杂，和本条测试的目标（位置）无关。
+        let mut rng = Rng::new(seed ^ 0x5A5A);
+        let ids: Vec<EntityId> = state.units().iter().map(|unit| unit.id).collect();
+        for id in ids {
+            let team = state.unit(id).expect("单位存在").team;
+            state.kill_unit(id, None, &map, &rules, &mut rng);
+            // 最多推进 respawn_ticks + 2 个 tick：正常复活在第 10 个 tick，
+            // 多给 2 个 tick 的余量是为了容忍「阵营被其他存活单位占满」时的顺延。
+            for _ in 0..(rules.respawn_ticks + 2) {
+                if is_alive(&state, id) {
+                    break;
+                }
+                crate::engine::resolve_respawns(&mut state, &map, &rules);
+            }
+            let unit = state.unit(id).expect("单位存在");
+            assert!(unit.alive, "单位 {id} 在 {} tick 内没有复活", rules.respawn_ticks);
+            assert!(
+                map.in_base(team, unit.pos.x, unit.pos.y),
+                "队伍 {team} 的单位 {id} 复活在 {:?}，不在己方阵营（左上角 {:?}）",
+                unit.pos,
+                map.base_of(team)
+            );
+        }
+    }
+}
+
 /// §14-11（续）：己方阵营满员时复活延后，腾出格子后的下一个 tick 才复活。
 #[test]
 fn respawn_is_delayed_while_own_base_is_full() {
@@ -1198,5 +1262,120 @@ fn flag_drop_falls_back_to_wider_ring_then_center() {
             .iter()
             .any(|event| matches!(event, GameEvent::FlagDropped { flag, .. } if *flag == flag_id)),
         "退场的旗不发 flag_dropped 事件"
+    );
+}
+
+// ---------------------------------------------------------------- §14-15 虚空致死（rules_version 2）
+
+/// 虚空在移动层是「可进入」的：移动成功、消耗 1 AP、发出 `unit_moved`，**不产生 `illegal_action`**。
+/// 随后由独立的虚空致死步处决：哪怕满血也会立刻死亡，并进入复活倒计时。
+///
+/// 这条测试同时是「虚空 ≠ 墙」的可执行规格（docs/rules.md §1）：
+/// 墙的判定发生在移动阶段（拒绝 + 非法动作），虚空的判定发生在移动之后（允许 + 死亡）。
+#[test]
+fn entering_void_is_a_legal_move_that_kills_immediately() {
+    let rules = RulesConfig::default();
+    let mut rng = Rng::new(7);
+    let (mut state, mut map, _) = flat_state(2);
+    place(&mut state, 1, Coord::new(5, 5));
+    let void = map.index(6, 5).expect("(6,5) 在地图内");
+    map.terrain[void] = Terrain::Void;
+
+    resolve_moves(&mut state, &map, &[cmd(1, Action::Move(Direction::Right))]);
+    assert_eq!(
+        state.unit(1).expect("单位 1 存在").pos,
+        Coord::new(6, 5),
+        "虚空必须允许进入（若这里失败，说明又被当成墙拒了）"
+    );
+    assert_eq!(ap(&state, 1), 1, "移动固定消耗 1 AP，虚空不额外收费");
+    assert!(
+        illegal_reasons(&state).is_empty(),
+        "走进虚空不是非法动作，实际 {:?}",
+        illegal_reasons(&state)
+    );
+    assert!(is_alive(&state, 1), "移动阶段结束时还没到死亡结算");
+
+    crate::conflict::resolve_void_falls(&mut state, &map, &rules, &mut rng);
+    assert!(!is_alive(&state, 1), "踏在虚空上的单位必须立刻死亡");
+    assert_eq!(state.deaths[0], 1, "记一次死亡");
+    assert_eq!(state.kills[1], 0, "环境致死不计任何队伍的击杀");
+    assert_eq!(
+        state.unit(1).expect("单位 1 存在").respawn_timer,
+        rules.respawn_ticks,
+        "死亡后进入复活倒计时"
+    );
+    let died_by = state.events.iter().find_map(|event| match event {
+        GameEvent::UnitDied { unit, by, .. } if *unit == 1 => Some(*by),
+        _ => None,
+    });
+    assert_eq!(died_by, Some(None), "掉入虚空的 unit_died 里 by = None");
+}
+
+/// 掉进虚空后，同一 tick 的后续结算阶段（攻击/放炸弹/拾旗）都不该再让它行动。
+///
+/// 这条测试锁住 `engine.rs` 里「移动 → 虚空致死 → 攻击 → 放炸弹 → 拾旗」的顺序：
+/// 若把虚空致死挪到攻击之后，死人开火就会变成可能。
+#[test]
+fn falling_into_void_cancels_later_phases_of_the_same_tick() {
+    let rules = RulesConfig::default();
+    let mut rng = Rng::new(9);
+    let (mut state, mut map, _) = flat_state(2);
+    place(&mut state, 1, Coord::new(5, 5)); // 蓝队单位
+    place(&mut state, 4, Coord::new(8, 5)); // 红队单位，曼哈顿距离 3，本来打得中
+    let void = map.index(5, 4).expect("(5,4) 在地图内");
+    map.terrain[void] = Terrain::Void;
+
+    // 同一个单位同时提交「往上跳进虚空」与「打红队」：引擎按阶段结算。
+    resolve_moves(&mut state, &map, &[cmd(1, Action::Move(Direction::Up))]);
+    crate::conflict::resolve_void_falls(&mut state, &map, &rules, &mut rng);
+    resolve_attacks(
+        &mut state,
+        &map,
+        &rules,
+        &mut rng,
+        &[cmd(1, Action::Attack(4))],
+    );
+
+    assert!(!is_alive(&state, 1), "先死");
+    assert_eq!(hp(&state, 4), rules.unit_max_hp, "死人不该再造成伤害");
+    assert!(
+        state
+            .events
+            .iter()
+            .all(|event| !matches!(event, GameEvent::UnitAttacked { .. })),
+        "本 tick 不该出现任何 unit_attacked 事件"
+    );
+}
+
+/// 虚空不会成为安全落点：死亡单位掉旗永远不会落在虚空上（flag.rs 用 `is_walkable` 选候选格）。
+#[test]
+fn dropped_flag_never_lands_on_void() {
+    let mut rng = Rng::new(11);
+    let (mut state, mut map, _) = flat_state(2);
+    let origin = Coord::new(6, 6);
+    let flag_id = 1;
+    state.flags.push(Flag {
+        id: flag_id,
+        pos: origin,
+        carrier: None,
+    });
+    // 把 3×3 全部挖成虚空：非法（会致死）→ 引擎必须扩大到 5×5 找安全格。
+    for dy in -1..=1 {
+        for dx in -1..=1 {
+            let idx = map.index(origin.x + dx, origin.y + dy).expect("圈内坐标合法");
+            map.terrain[idx] = Terrain::Void;
+        }
+    }
+    crate::flag::drop_carried_flag(&mut state, &map, &mut rng, origin, flag_id);
+    let dropped = state.flags.iter().find(|flag| flag.id == flag_id).expect("旗应还在场");
+    assert!(
+        map.is_walkable(dropped.pos.x, dropped.pos.y),
+        "旗落在 {:?}，那里必须是可以安全站人的格子（绝不能是虚空）",
+        dropped.pos
+    );
+    assert!(
+        dropped.pos.manhattan(origin) > 1,
+        "3×3 全是虚空时必须扩大搜索范围，实际落在 {:?}",
+        dropped.pos
     );
 }

@@ -15,6 +15,7 @@ use clap::Parser;
 
 use cli::args::{Cli, Command};
 use cli::runner::{run_batch, BatchOutcome};
+use cli::textwidth::{render_table, Align};
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -49,28 +50,64 @@ fn print_summary(outcome: &BatchOutcome) {
     );
 
     println!();
-    println!(
-        "{:<16} {:>7} {:>4} {:>4} {:>4} {:>9} {:>8}",
-        "AI", "局数", "胜", "平", "负", "胜率", "评分"
-    );
-    for row in &report.by_ai_name {
-        println!(
-            "{:<16} {:>7} {:>4} {:>4} {:>4} {:>9.3} {:>8.1}",
-            row.ai_name, row.matches, row.wins, row.draws, row.losses, row.win_rate, row.rating
-        );
+    // 表格用 cli::textwidth 渲染：中文表头按 2 列宽计算，`{:<16}` 那种按字符数补齐会让
+    // 中文列错位（用户反馈的问题）。列宽由 render_table 取「表头与该列内容」的最大显示宽度。
+    let by_ai_headers = ["AI", "局数", "胜", "平", "负", "胜率", "评分"];
+    let by_ai_aligns = [
+        Align::Left,
+        Align::Right,
+        Align::Right,
+        Align::Right,
+        Align::Right,
+        Align::Right,
+        Align::Right,
+    ];
+    let by_ai_rows: Vec<Vec<String>> = report
+        .by_ai_name
+        .iter()
+        .map(|row| {
+            vec![
+                row.ai_name.clone(),
+                row.matches.to_string(),
+                row.wins.to_string(),
+                row.draws.to_string(),
+                row.losses.to_string(),
+                format!("{:.3}", row.win_rate),
+                format!("{:.1}", row.rating),
+            ]
+        })
+        .collect();
+    for line in render_table(&by_ai_headers, &by_ai_aligns, &by_ai_rows) {
+        println!("{line}");
     }
 
     if report.by_slot.len() > 1 {
         println!();
-        println!(
-            "{:<6} {:<16} {:>7} {:>4} {:>9} {:>8}",
-            "槽位", "AI", "局数", "胜", "胜率", "评分"
-        );
-        for row in &report.by_slot {
-            println!(
-                "{:<6} {:<16} {:>7} {:>4} {:>9.3} {:>8.1}",
-                row.slot, row.ai_name, row.matches, row.wins, row.win_rate, row.rating
-            );
+        let by_slot_headers = ["槽位", "AI", "局数", "胜", "胜率", "评分"];
+        let by_slot_aligns = [
+            Align::Right,
+            Align::Left,
+            Align::Right,
+            Align::Right,
+            Align::Right,
+            Align::Right,
+        ];
+        let by_slot_rows: Vec<Vec<String>> = report
+            .by_slot
+            .iter()
+            .map(|row| {
+                vec![
+                    row.slot.to_string(),
+                    row.ai_name.clone(),
+                    row.matches.to_string(),
+                    row.wins.to_string(),
+                    format!("{:.3}", row.win_rate),
+                    format!("{:.1}", row.rating),
+                ]
+            })
+            .collect();
+        for line in render_table(&by_slot_headers, &by_slot_aligns, &by_slot_rows) {
+            println!("{line}");
         }
     }
 

@@ -34,7 +34,15 @@ pub const ENGINE_VERSION: u32 = 1;
 
 /// 规则版本：游戏规则（数值与判定）版本。变更历史：
 /// * `1`：初版规则（见 `docs/rules.md` 的数值表）。
-pub const RULES_VERSION: u32 = 1;
+/// * `2`：虚空改为「可进入但致死」（掉入虚空）。与 `1` 的关键差别：
+///   移动层不再把虚空当作墙拒绝（不再产生 `illegal_action`），而是允许进入、消耗 1 AP，
+///   随后在同一个 tick 内死亡（`unit_died`，`by = null`，不计任何队伍击杀）。
+///   因此 `rules_version = 1` 与 `2` 的对局结果（尤其死亡数与得分）**不可直接比较**。
+///
+/// 为什么这次只升 `RULES_VERSION` 而不升 `ENGINE_VERSION`：
+/// 回放 JSON 结构、字段含义、事件类型集合都没有变化（虚空致死复用既有的 `unit_died`），
+/// 变的只是「同一份数据代表的规则」——正是 `rules_version` 的定义。
+pub const RULES_VERSION: u32 = 2;
 
 #[cfg(test)]
 mod tests {

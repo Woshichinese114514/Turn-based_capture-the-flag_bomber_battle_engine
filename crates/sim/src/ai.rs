@@ -98,8 +98,24 @@ impl MapView {
     }
 
     /// 地形层面是否可站人。
+    ///
+    /// 注意虚空**不算**可站人（走进去会死）。AI 规划移动时应当用本函数，
+    /// 用 [`MapView::can_enter`] 会让单位主动跳坑。
     pub fn is_walkable(&self, x: i32, y: i32) -> bool {
         self.terrain_at(x, y).is_some_and(Terrain::is_walkable)
+    }
+
+    /// 移动层面是否可以进入（含虚空）。
+    ///
+    /// 提供给需要区分「走不了」与「走得进去但会死」的 AI（例如以后想写一个
+    /// 「宁可跳虚空也不让对手得分」的 AI）。基线 AI 一律只用 [`MapView::is_walkable`]。
+    pub fn can_enter(&self, x: i32, y: i32) -> bool {
+        self.terrain_at(x, y).is_some_and(Terrain::can_be_entered)
+    }
+
+    /// 该格是否致命（虚空）。
+    pub fn is_lethal(&self, x: i32, y: i32) -> bool {
+        self.terrain_at(x, y).is_some_and(Terrain::is_lethal)
     }
 
     /// 地形层面是否阻挡视线（越界视为阻挡）。

@@ -1,4 +1,4 @@
-//! tick 内的移动结算：意图收集 → 撞人冲突 → 地形检查 → 占用不动点 → 执行。
+//! tick 内的移动结算：意图收集 → 撞人冲突 → 地形检查 → 占用不动点 → 执行 → 虚空致死。
 //!
 //! 实现 `docs/rules.md` §7 的八条步骤。这个模块是整个引擎里最容易写错的地方，
 //! 因此把「为什么这么判」逐条写在代码旁边。
@@ -9,15 +9,18 @@
 //!   会被拒绝并记 `illegal_action`，因为本引擎的移动是「全队同时移动」语义，
 //!   一个单位在同一 tick 里移动两次没有对应规则。
 //! * **撞人 vs 撞墙**：撞人（多个单位抢同一格）**消耗 1 AP** 且留原地，
-//!   属于合法但失败的尝试，记 `move_conflict`；撞墙/虚空/敌方阵营/被占位是
+//!   属于合法但失败的尝试，记 `move_conflict`；撞墙/敌方阵营/被占位是
 //!   AI 的规划错误，**不消耗 AP**，记 `illegal_action`（§7.3/§7.4/§7.7）。
+//! * **虚空不是墙**：虚空在移动层是**可进入**的（消耗 1 AP、正常移动、发 `unit_moved`），
+//!   代价是踏上去立刻死亡 —— 见本模块末尾的 [`resolve_void_falls`]。所以地形检查里
+//!   虚空不会产生 `illegal_action`，这与「撞墙不消耗 AP」的语义刻意区分开。
 //! * **不动点**：判断「目标格被占」时，先假设所有通过地形检查的意图都会成功，
 //!   再反复扫描，把「目标格被一个不会离开的单位占着」的意图标记为失败，
 //!   直到某一轮没有变化（§7.5）。这样 A→B,B→A 双方成功，链式阻挡全部失败。
 //! * **执行顺序**：先算完所有判定再统一改坐标（§7.6）。若边算边移动，
 //!   结果会依赖意图的遍历顺序，破坏可复现性。
 
-use mapgen::MapData;
+use mapgen::{MapData, Rng};
 use protocol::{Coord, EntityId, GameEvent, TeamId, Terrain};
 
 use crate::ai::{Action, UnitCommand};
@@ -206,19 +209,21 @@ fn move_rejection(state: &GameState, unit_id: EntityId, intents: &[MoveIntent]) 
     None
 }
 
-/// 地形层面能否进入：越界 / 墙 / 虚空 / 敌方阵营。
+/// 地形层面能否进入：越界 / 墙 / 敌方阵营。
 ///
 /// 注意这里**不包含**「被单位占用」——那属于不动点迭代（§7.5），
 /// 因为占用者的去留取决于其他意图。撞地形不消耗 AP 是明确的设计选择：
 /// 这只可能来自 AI 规划错误，不该惩罚它的 AP。
+///
+/// 也**不把虚空当墙**：虚空可进入但致命（§1），死亡交给 [`resolve_void_falls`]，
+/// 因此这里既不拒绝、也不消耗额外代价。
 fn terrain_rejection(map: &MapData, team: TeamId, to: Coord) -> Option<String> {
     if !map.in_bounds(to.x, to.y) {
         return Some("目标格越界".to_string());
     }
     match map.terrain_at(to.x, to.y) {
         Some(Terrain::Wall) => return Some("目标是墙".to_string()),
-        Some(Terrain::Void) => return Some("目标是虚空".to_string()),
-        Some(terrain) if !terrain.is_walkable() => {
+        Some(terrain) if !terrain.can_be_entered() => {
             return Some("目标地形不可通行".to_string());
         }
         None => return Some("目标格越界".to_string()),
@@ -227,5 +232,48 @@ fn terrain_rejection(map: &MapData, team: TeamId, to: Coord) -> Option<String> {
     match map.in_any_base(to.x, to.y) {
         Some(owner) if owner != team => Some("目标是敌方阵营".to_string()),
         _ => None,
+    }
+}
+
+/// 虚空致死：让所有**站在致命地形上**的存活单位立刻死亡。
+///
+/// ## 为什么单独一步、紧跟移动之后
+///
+/// 规则要求「走到虚空上立即死亡」（`docs/rules.md` §1）。实现上有两个选择：
+/// ① 在移动执行循环里就地处决；② 移动全部结束后统一扫描一遍地形。
+/// 这里选 ②，理由有三条：
+/// * 就地处决会让「哪个单位先被判死」依赖意图遍历顺序，而交换位置（A→B、B→A）
+///   这类情形下顺序本来不该有影响；统一扫描只依赖单位 ID 顺序，天然确定；
+/// * 扫描的是**地形**而不是「谁移动了」，因此像「炸弹把单位炸进虚空」这种将来可能
+///   出现的位移机制（击退）也会被自动覆盖；
+/// * 处决必须发生在攻击/放炸弹/拾旗**之前**，否则掉进坑里的单位还能开一枪/放颗雷，
+///   这显然与「立即死亡」矛盾。`engine.rs` 的调用位置保证了这一点。
+///
+/// ## 死亡结算的复用
+///
+/// 直接调 `GameState::kill_unit(victim, by = None, ..)`，于是掉旗、`deaths + 1`、
+/// `unit_died` 事件、复活倒计时全部与「被炸死」走同一条路径，不会有第二份死亡逻辑。
+/// `by = None` 表示「环境致死」：`kills` 只统计敌方击杀，所以谁也不会因为
+/// 「把对手逼进虚空」而得分 —— 这一点是刻意的，避免出现「推人下坑拿人头」的
+/// 未定义玩法（引擎目前也没有击退机制）。
+///
+/// 注意它与「墙」的另一个区别：虚空**不会**被 `is_walkable` 认为可站，
+/// 所以旗不会掉在虚空、旗也不会刷在虚空（`flag.rs` 用 `is_walkable` 选候选格）。
+pub(crate) fn resolve_void_falls(
+    state: &mut GameState,
+    map: &MapData,
+    rules: &crate::RulesConfig,
+    rng: &mut Rng,
+) {
+    // 先收集要处决的 ID 再执行：`kill_unit` 会改 `units`，边遍历边杀在借用检查器下
+    // 也不允许。按 ID 升序（`units` 的存储顺序）保证事件顺序可复现。
+    let victims: Vec<EntityId> = state
+        .units()
+        .iter()
+        .filter(|unit| unit.alive && map.is_lethal(unit.pos.x, unit.pos.y))
+        .map(|unit| unit.id)
+        .collect();
+    for victim in victims {
+        state.kill_unit(victim, None, map, rules, rng);
     }
 }

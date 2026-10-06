@@ -29,6 +29,10 @@ TERRAIN_WALL = 1
 TERRAIN_VOID = 2
 TERRAIN_BASE_OFFSET = 3
 
+# 与 crates/protocol/src/versions.rs 保持一致（协议版本 → 样例版本）。
+ENGINE_VERSION = 1
+RULES_VERSION = 2
+
 WIDTH = 15
 HEIGHT = 15
 CENTER = (7, 7)
@@ -454,10 +458,14 @@ class Demo:
 
 
 def build_init(demo: Demo, teams: int, ai_names: list[str]) -> dict[str, Any]:
+    # 版本号三件套必须与真实引擎一致，否则样例会在「版本不匹配」上给出误导信号：
+    # engine 1 / map_gen 1 没变；rules 2 = 虚空改为「可进入但立即死亡」（JSON 结构未变，
+    # 见 docs/replay-format.md 的版本历史）。样例本身仍不会主动走进虚空——那属于规则演示，
+    # 由 crates/sim/src/tests.rs 的回归测试负责。
     return {
         "type": "init",
-        "engine_version": 1,
-        "rules_version": 1,
+        "engine_version": ENGINE_VERSION,
+        "rules_version": RULES_VERSION,
         "map_gen_version": 1,
         "map": {"width": WIDTH, "height": HEIGHT, "map_gen_version": 1, "terrain": demo.terrain},
         "teams": [{"team_id": t, "ai_name": ai_names[t],

@@ -1,0 +1,12 @@
+# 构建与运行产物（本地缓存，不进仓库）
+#
+# target/        cargo 的编译产物（通过 scripts/cargo 指向工作区内的 CARGO_TARGET_DIR）
+# .cargo-home/   cargo 的 CARGO_HOME（本机 $HOME/.cargo 只读，见 scripts/cargo 的说明）
+# out/           qfr run 的输出目录（manifest/summary/matches/replays）与验收产物
+# .tmp/          临时目录：浏览器 user-data、A/B 实验备份、诊断 dump 等
+# *.log          AI 调试日志、验收日志
+target/
+.cargo-home/
+out/
+.tmp/
+*.log

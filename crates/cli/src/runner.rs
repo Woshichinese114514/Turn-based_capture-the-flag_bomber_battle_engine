@@ -294,7 +294,10 @@ fn build_scoring_config(args: &RunArgs) -> Result<ScoringConfig, CliError> {
         )));
     }
     let sum: f64 = weights.iter().sum();
-    if !(sum > 0.0) {
+    // 写成 `<= 0.0 || !is_finite()` 而不是 `!(sum > 0.0)`：两者对 NaN 的行为一致
+    // （都判错），但显式写法能说明「NaN 也算非法权重」，也避免 clippy 的
+    // `neg_cmp_op_on_partial_ord` 警告。
+    if sum <= 0.0 || !sum.is_finite() {
         return Err(CliError::BadWeights(
             "三个权重之和必须大于 0，否则 strength 恒等于 0.5，评分没有意义".to_string(),
         ));

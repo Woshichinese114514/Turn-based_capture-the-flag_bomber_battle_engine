@@ -14,6 +14,7 @@
 //! * [`manifest`]：`manifest.json` / `summary.json` / `matches.jsonl` 的结构定义；
 //! * [`runner`]：校验 → 种子计划 → rayon 并行跑局 → 单线程统一写盘（四件套）；
 //! * [`timefmt`]：不依赖 chrono 的 UTC 时间格式化与运行期熵源；
+//! * [`textwidth`]：终端表格按「显示宽度」（中文占 2 列）对齐，而不是按字符数；
 //! * [`error`]：库层结构化错误（`thiserror`），`main` 再转成 `anyhow`。
 
 pub mod args;
@@ -21,6 +22,7 @@ pub mod error;
 pub mod manifest;
 pub mod runner;
 pub mod seed;
+pub mod textwidth;
 pub mod timefmt;
 
 pub use args::{Cli, Command, ReplaySample, RunArgs};
@@ -28,3 +30,4 @@ pub use error::CliError;
 pub use manifest::{Manifest, ManifestConfig, MatchLine, SummaryFile, Versions};
 pub use runner::{run_batch, BatchOutcome};
 pub use seed::{SeedMode, SeedPlan, SeedPlanInfo};
+pub use textwidth::{display_width, pad_left, pad_right, render_table, Align};

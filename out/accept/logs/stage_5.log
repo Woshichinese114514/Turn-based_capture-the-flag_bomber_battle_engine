@@ -1,6 +1,0 @@
-   OK：replay=../out/accept/run2p/replays/match_00000.jsonl&tick=30 → real_2p.png（128271 字节）
-   OK：replay=../samples/demo_2p.jsonl&tick=12 → demo_2p.png（126565 字节）
-   OK：replay=../samples/demo_3p.jsonl&tick=12 → demo_3p.png（125449 字节）
-   OK：replay=../samples/version_mismatch.jsonl&tick=5 → version_mismatch.png（131776 字节）
-   OK：replay=../samples/malformed.jsonl&tick=3 → malformed.png（142620 字节）
-   OK：replay=../README.md → not_a_replay.png（139370 字节）

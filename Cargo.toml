@@ -26,6 +26,11 @@ edition = "2021"
 rust-version = "1.82"
 license = "MIT"
 description = "回合制夺旗炸弹人对战引擎（纯逻辑模拟 + 批量对局 + 回放导出）"
+# 贡献者：项目发起/规则设计 + AI 结对实现（见 README.md 的「贡献者」一节）。
+authors = [
+    "Woshichinese114514",
+    "DeepSeek (AI pair programmer)",
+]
 
 [workspace.dependencies]
 # 序列化：回放 JSONL / manifest.json / summary.json / matches.jsonl 全部走 serde。

@@ -29,6 +29,7 @@ docs/
 tools/
   validate_replay.py  回放契约校验器（0 error 才算过）
   check_versions.py   manifest / summary / matches / 回放 init 四处版本号一致性
+  analyze_ai.py       把一批 replays 汇总成 AI 行为指标（冲突/非法动作/横跳/停顿/掉虚空，按 AI 归因）
   acceptance.sh       五关验收脚本（全量测试 → 批量对局 → 回放校验 → 版本一致性 → Web 无头取证）
   shot.js             无头取证工具（CDP：等 __QFR_READY__ → 断言 __QFR_STATUS__ → 截图）
   make_demo_replay.py 生成 samples/ 下的示例回放
@@ -154,6 +155,9 @@ python3 tools/check_versions.py out/fixed_100                               # ma
    **四处都必须写版本号且一致**；`tools/check_versions.py` 会强制比对，缺失/为 0 直接判失败。
 4. 不同 `rules_version` 的两批成绩不可放进同一张榜比较；`summary.json` 里带着该批次所属的
    `teams` 与 `rules_version`，就是为了让下游拒绝跨版本比较。
+5. 当前 `rules_version = 2`：虚空从「不可通行」改为「**可进入、进入即死**」（环境致死、不计击杀），
+   墙仍是「不可进入 + 挡视线 + 挡爆炸」。这是**规则**变化而非格式变化，所以只升 `rules_version`
+   （回放 JSON 不变，Web UI 无需改解析），但两版的成绩不可直接比较。历史见 `docs/replay-format.md` 的版本历史段。
 
 ## 测试
 
@@ -166,3 +170,33 @@ tools/acceptance.sh 3                   # 只重跑某一关（复用 ARTIFACT_D
 cli 侧的集成测试在 `crates/cli/tests/`：`seed_modes.rs`（三种种子模式，规则 §14-20）、
 `reproducibility.rs`（批量逐字节可复现，§14-21）、`smoke.rs`（100 局不 panic + 回放结构 +
 `tools/validate_replay.py` 交叉校验，§14-22）。
+
+## AI 基线与已知限制
+
+三个基线 AI 的设计目标不同，**不是三个强度档位**，而是三种可对比的行为策略：
+
+| AI | 策略 | 备注 |
+|---|---|---|
+| `random` | 随机移动/攻击/放炸弹 | 强度下界；也是未指定槽位的默认值 |
+| `greedy_flag` | 抢最近的旗 → 回己方阵营得分；没有旗时在中心区待命（三单位分散占位） | 主基线 |
+| `defender` | 守在己方阵营 3×3 内（空闲时每 25 tick 在 9 格里轮换站位），只打进入射程的敌人 | 反抢旗基线 |
+
+已记录在代码注释里的取舍（改动前请先读 `crates/ai/src/greedy_flag.rs` 与 `defender.rs` 的模块文档）：
+
+- `greedy_flag` 用「目标迟滞 + 无进展重规划 + 队友占位排除」压制 A→B→A 打转：
+  2 队 60 局批量里冲突次数从 366 降到 **110**（−70%），横跳相对重写前降约 84%。
+  代价是 3 队场景横跳略升（+16%）、场均得分略降；这是**刻意选择的权衡**（用户需求是减少冲突）。
+- 仍存在的残留问题：同队三单位挤在同一条窄路时，会互相把对方当障碍而「抱团横跳」
+  （典型样本：`match_00015`，单局横跳 1100 次、冲突 0、全场不开火）。修它需要重做目标分配，
+  属于已知限制，已在 `crates/ai/src/greedy_flag.rs` 的模块文档里写明证据与假设。
+- `defender` 在本游戏里**天然很少开火**：得分要把旗送回**自己**阵营，对手没有理由走进你的基地，
+  所以 `THREAT_RADIUS` 常常整局不触发——这是地图/规则决定的，不是 AI 失效。
+- 想量化上述指标：`python3 tools/analyze_ai.py out/<run>`（可按 AI 名字拆分）。
+
+## 贡献者
+
+- 项目发起、规则设计与验收：[Woshichinese114514](https://github.com/Woshichinese114514)
+- Rust 引擎 / 地图生成 / AI / 评分 / CLI / Web UI 回放查看器：**DeepSeek**（AI 结对实现，
+  按 `docs/` 里的契约分工完成：`crates/*`、`webui/*`、`tools/*` 与全部验收脚本）
+- 回放格式契约（`docs/replay-format.md`）与规则文档（`docs/rules.md`）由双方共同冻结，
+  任何格式变更都要升版本号并同步两端。

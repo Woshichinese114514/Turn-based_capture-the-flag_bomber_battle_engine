@@ -5,7 +5,7 @@
 //! ```text
 //! 1. 清理与重置：清 attacked_this_turn、存活单位 AP = ap_per_unit、死亡单位 AP = 0
 //! 2. AI 决策：按 (tick + slot) % teams 的轮换顺序，每队拿「决策前快照」决定动作
-//! 3. 统一结算：移动（§7 冲突） → 攻击 → 放炸弹 → 拾旗
+//! 3. 统一结算：移动（§7 冲突） → 虚空致死 → 攻击 → 放炸弹 → 拾旗
 //! 4. 炸弹：所有既有炸弹倒计时减 1，减到 0 立即爆炸
 //! 5. 复活：死亡倒计时减 1，减到 0 在己方阵营找空格满血复活（满员则延后重试）
 //! 6. 旗刷新检查：每 flag_spawn_interval 个 tick 检查一次
@@ -193,9 +193,16 @@ impl Sim {
             commands.extend(actions.commands);
         }
 
-        // ---- 3. 统一结算：移动 → 攻击 → 放炸弹 → 拾旗 ----
+        // ---- 3. 统一结算：移动 → 虚空致死 → 攻击 → 放炸弹 → 拾旗 ----
         // 每个子阶段内部都会重新检查 AP 与前置条件，因此顺序不可交换。
+        // 「虚空致死」夹在移动之后、其余动作之前：掉进坑里的单位不应还能开火/放雷/拾旗。
         crate::conflict::resolve_moves(&mut self.state, &self.map, &commands);
+        crate::conflict::resolve_void_falls(
+            &mut self.state,
+            &self.map,
+            &self.config.rules,
+            &mut self.rng,
+        );
         crate::combat::resolve_attacks(
             &mut self.state,
             &self.map,
