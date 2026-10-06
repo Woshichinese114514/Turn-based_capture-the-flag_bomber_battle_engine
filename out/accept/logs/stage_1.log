@@ -1,0 +1,247 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.01s
+     Running unittests src/lib.rs (target/debug/deps/ai-ea255739210abd59)
+
+running 29 tests
+test common::tests::can_stand_forbids_enemy_base_only ... ok
+test common::tests::supercover_los_rejects_diagonal_corner_wall ... ok
+test common::tests::bfs_routes_around_wall_column ... ok
+test common::tests::unit_plan_refuses_move_away_after_planned_pick ... ok
+test common::tests::unit_plan_refuses_move_that_breaks_planned_attack ... ok
+test common::tests::unit_plan_respects_ap_budget ... ok
+test common::tests::wall_blocks_sight_void_does_not ... ok
+test defender::tests::defender_attacks_enemy_in_range ... ok
+test defender::tests::defender_presses_enemy_inside_threat_radius ... ok
+test defender::tests::defender_returns_home_when_dragged_too_far ... ok
+test defender::tests::idle_defender_already_on_post_wastes_no_ap ... ok
+test defender::tests::patrol_post_stays_inside_base_and_is_deterministic ... ok
+test defender::tests::defender_returns_home_when_wounded ... ok
+test defender::tests::idle_defender_rotates_guard_posts_inside_base ... ok
+test tests::create_unknown_name_returns_none ... ok
+test tests::empty_registry_is_usable ... ok
+test tests::created_ai_reports_the_registered_name ... ok
+test tests::duplicate_registration_overwrites_without_adding_entries ... ok
+test tests::register_all_registers_three_baselines ... ok
+test random::tests::random_ai_plays_full_match_without_panic ... ok
+test random::tests::random_ai_handles_three_teams ... ok
+test defender::tests::defender_ai_plays_full_match_without_panic ... ok
+test random::tests::random_ai_same_seed_reproduces_exactly ... ok
+test defender::tests::defender_ai_handles_three_teams ... ok
+test defender::tests::defender_ai_same_seed_reproduces_exactly ... ok
+test defender::tests::defender_ai_mixes_with_other_baselines ... ok
+test greedy_flag::tests::greedy_flag_ai_plays_full_match_without_panic ... ok
+test greedy_flag::tests::greedy_flag_ai_handles_three_teams ... ok
+test greedy_flag::tests::greedy_flag_ai_same_seed_reproduces_exactly ... ok
+
+test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+
+     Running unittests src/lib.rs (target/debug/deps/cli-cafb8fa3dc4f09c3)
+
+running 26 tests
+test args::tests::replay_sample_parses_all_forms ... ok
+test error::tests::error_messages_are_actionable_chinese ... ok
+test runner::tests::replay_sample_gating_matches_flag ... ok
+test manifest::tests::summary_file_carries_all_three_versions_at_top_level ... ok
+test manifest::tests::match_line_is_a_superset_of_match_result ... ok
+test seed::tests::ai_seed_formula_matches_rules_doc ... ok
+test seed::tests::fixed_mode_requires_seed_and_ignores_base_seed ... ok
+test seed::tests::mode_strings_and_flags_agree_with_cli_values ... ok
+test seed::tests::per_match_with_base_seed_is_reproducible_and_maps_differ ... ok
+test seed::tests::per_match_without_base_seed_uses_entropy ... ok
+test seed::tests::fixed_random_reuses_one_map_but_varies_ai_salt ... ok
+test seed::tests::splitmix64_stream_first_values_are_stable ... ok
+test timefmt::tests::formats_known_instants ... ok
+test seed::tests::plan_info_samples_at_most_available ... ok
+test runner::tests::ai_specs_resolve_to_per_team_names ... ok
+test timefmt::tests::now_and_entropy_are_sane ... ok
+test args::tests::cli_shape_is_consistent ... ok
+test timefmt::tests::round_trips_day_boundaries ... ok
+test seed::tests::mix64_reference_values_are_stable ... ok
+test seed::tests::mapgen_splitmix64_is_not_the_one_shot_hash ... ok
+test manifest::tests::versions_block_matches_top_level_fields ... ok
+test args::tests::defaults_follow_rules_doc ... ok
+test runner::tests::created_time_variants ... ok
+test runner::tests::scoring_config_overrides_and_rejects_bad_weights ... ok
+test args::tests::team_count_range_is_enforced_at_parse_time ... ok
+test runner::tests::args_validation_rejects_bad_combinations ... ok
+
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/qfr-c4774ddbf03be120)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/reproducibility.rs (target/debug/deps/reproducibility-511092d657dc6dc5)
+
+running 2 tests
+test matches_jsonl_is_sorted_by_match_index ... ok
+test batch_is_byte_reproducible ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/seed_modes.rs (target/debug/deps/seed_modes-ef7d6873a5bf2239)
+
+running 6 tests
+test fixed_without_seed_is_rejected ... ok
+test seed_is_ignored_outside_fixed_mode_with_a_warning ... ok
+test fixed_seed_is_used_verbatim ... ok
+test fixed_random_shares_one_map_but_varies_ai_seed ... ok
+test per_match_without_base_seed_uses_entropy ... ok
+test per_match_with_base_seed_is_reproducible ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/smoke.rs (target/debug/deps/smoke-7d3e164606c9e170)
+
+running 5 tests
+test unsupported_map_gen_version_is_rejected ... ok
+test replay_files_are_well_formed ... ok
+test output_dir_is_created ... ok
+test hundred_matches_random_vs_random_do_not_panic ... ok
+/home/zqh/项目/抢旗人/target/qfr-validator/run/replays/match_00000.jsonl: OK-ish  25×25 teams=2 frames=40 versions=(1/1/1) events={'unit_moved': 148, 'bomb_placed': 48, 'bomb_exploded': 46, 'flag_spawned': 2, 'unit_died': 11, 'unit_respawned': 8}
+
+校验完成：1 个文件，错误 0，警告 0，失败文件 0
+/home/zqh/项目/抢旗人/target/qfr-validator/run/replays/match_00001.jsonl: OK-ish  25×25 teams=2 frames=40 versions=(1/1/1) events={'unit_moved': 128, 'bomb_placed': 64, 'bomb_exploded': 64, 'unit_died': 14, 'flag_spawned': 2, 'unit_respawned': 11}
+
+校验完成：1 个文件，错误 0，警告 0，失败文件 0
+/home/zqh/项目/抢旗人/target/qfr-validator/run/replays/match_00002.jsonl: OK-ish  25×25 teams=2 frames=40 versions=(1/1/1) events={'unit_moved': 141, 'bomb_placed': 66, 'bomb_exploded': 60, 'unit_died': 12, 'flag_spawned': 2, 'unit_respawned': 10}
+
+校验完成：1 个文件，错误 0，警告 0，失败文件 0
+test replays_pass_python_validator ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running unittests src/lib.rs (target/debug/deps/mapgen-a7865d8f237d79e2)
+
+running 13 tests
+test rng::tests::different_seeds_diverge ... ok
+test rng::tests::gen_bool_boundaries ... ok
+test rng::tests::next_f64_stays_in_unit_interval ... ok
+test rng::tests::gen_index_and_ranges_are_in_bounds ... ok
+test rng::tests::same_seed_same_sequence ... ok
+test rng::tests::shuffle_is_a_permutation_and_deterministic ... ok
+test tests::invalid_specs_return_err ... ok
+test tests::map_gen_version_is_recorded ... ok
+test tests::same_seed_same_map_and_different_seed_differs ... ok
+test tests::two_team_and_three_team_base_layout_matches_contract ... ok
+test tests::bases_are_intact_and_center_is_not_all_wall ... ok
+test tests::extreme_densities_still_produce_a_playable_map ... ok
+test tests::every_base_reaches_center_for_many_seeds ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/protocol-fd2e73baf577f60f)
+
+running 13 tests
+test replay::tests::base_contains_uses_top_left_corner ... ok
+test result::tests::helpers_do_not_panic_on_short_arrays ... ok
+test types::tests::coord_index_is_row_major ... ok
+test types::tests::direction_steps_and_manhattan ... ok
+test types::tests::terrain_codes_round_trip ... ok
+test result::tests::match_result_json_shape_is_stable ... ok
+test replay::tests::init_accepts_missing_optional_seed ... ok
+test types::tests::validate_detects_short_terrain_array ... ok
+test replay::tests::replay_line_uses_type_tag ... ok
+test versions::tests::versions_are_positive ... ok
+test types::tests::terrain_serde_accepts_int_and_string ... ok
+test view::tests::event_type_names_match_serde_tags ... ok
+test view::tests::frame_round_trips_through_json ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/scoring-73423b7348b58786)
+
+running 17 tests
+test aggregate::tests::empty_results_produce_empty_report ... ok
+test aggregate::tests::aggregate_matches_hand_computed_values ... ok
+test aggregate::tests::extra_teams_do_not_break_slot_indexing ... ok
+test config::tests::for_teams_rejects_other_team_counts ... ok
+test aggregate::tests::three_team_report_has_its_own_system ... ok
+test error::tests::validate_teams_accepts_only_two_or_three ... ok
+test outcome::tests::out_of_range_team_is_loss_not_panic ... ok
+test outcome::tests::scores_take_precedence_over_derived_winner_field ... ok
+test aggregate::tests::zero_score_match_uses_half_share_and_no_nan ... ok
+test outcome::tests::unique_highest_score_wins ... ok
+test config::tests::defaults_match_frozen_contract ... ok
+test rating::tests::non_finite_inputs_degrade_to_average ... ok
+test rating::tests::rating_formula_is_stable_for_fixed_inputs ... ok
+test outcome::tests::tied_highest_score_is_draw_for_the_tied ... ok
+test rating::tests::rating_mapping_is_shared_but_teams_tag_differs ... ok
+test rating::tests::ten_times_odds_is_exactly_500_points ... ok
+test rating::tests::win_rate_shrinks_toward_half_until_enough_matches ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/sim-751b9335994180a6)
+
+running 30 tests
+test ai::tests::action_labels_match_replay_format ... ok
+test ai::tests::can_attack_needs_alive_ap_and_not_yet_attacked ... ok
+test ai::tests::map_view_helpers ... ok
+test ai::tests::team_actions_builders_are_chainable ... ok
+test ai::tests::observation_queries_respect_alive_and_team ... ok
+test tests::bomb_does_not_hurt_units_standing_in_base ... ok
+test tests::attack_range_three_hits_four_misses_and_wall_blocks_sight ... ok
+test tests::bomb_fuse_blast_radius_and_friendly_fire ... ok
+test tests::bombs_stack_on_one_cell_and_explode_independently ... ok
+test tests::carrier_death_drops_flag_in_legal_neighbour_cell ... ok
+test tests::carried_flag_view_coordinates_follow_carrier ... ok
+test tests::carrying_flag_into_own_base_scores ... ok
+test tests::bumping_wall_or_stationary_unit_costs_no_ap ... ok
+test tests::carrying_flag_outside_base_does_not_score ... ok
+test tests::carrying_unit_cannot_pick_a_second_flag ... ok
+test tests::conflict_chain_fails_while_cycle_succeeds ... ok
+test tests::dead_unit_respawns_on_tenth_tick_in_own_base ... ok
+test tests::flag_drop_falls_back_to_wider_ring_then_center ... ok
+test tests::second_attack_in_same_tick_is_rejected ... ok
+test tests::respawn_is_delayed_while_own_base_is_full ... ok
+test tests::sim_new_rejects_invalid_configuration ... ok
+test tests::second_attack_on_a_corpse_is_illegal ... ok
+test tests::swapping_units_both_succeed ... ok
+test tests::two_units_racing_for_one_cell_both_stay_and_spend_ap ... ok
+test tests::wall_stops_bomb_blast ... ok
+test tests::winner_rules_cover_ties_and_kill_tiebreak ... ok
+test tests::init_and_end_report_ai_names_from_config ... ok
+test tests::play_matches_run_to_end_and_respects_collect_replay ... ok
+test tests::different_seeds_produce_different_replays ... ok
+test tests::full_match_replay_is_byte_identical ... ok
+
+test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests ai
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests cli
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests mapgen
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests protocol
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests scoring
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests sim
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

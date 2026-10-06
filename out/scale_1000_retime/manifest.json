@@ -1,0 +1,82 @@
+{
+  "engine_version": 1,
+  "rules_version": 1,
+  "map_gen_version": 1,
+  "versions": {
+    "engine_version": 1,
+    "rules_version": 1,
+    "map_gen_version": 1
+  },
+  "created_time": "2026-10-06T10:07:48Z",
+  "created_time_unix": 1791281268,
+  "seed_mode": "per-match",
+  "seed_plan": {
+    "mode": "per-match",
+    "base_seed": null,
+    "fixed_seed": null,
+    "total_matches": 1000,
+    "map_seed_sample": [
+      10227984196883422485,
+      15024562206947150560,
+      3370589227363615197,
+      10811183606603589152,
+      13200632930940412147
+    ],
+    "ai_seed_sample": [
+      [
+        10227984194504287404,
+        10227984190209320108,
+        10227984185914352812
+      ],
+      [
+        15024562209532375897,
+        15024562205237408601,
+        15024562218122310489
+      ],
+      [
+        3370589229614839908,
+        3370589225319872612,
+        3370589221024905316
+      ],
+      [
+        10811183604690149273,
+        10811183600395181977,
+        10811183613280083865
+      ],
+      [
+        13200632928695064906,
+        13200632924400097610,
+        13200632937284999498
+      ]
+    ]
+  },
+  "config": {
+    "matches": 1000,
+    "max_ticks": 300,
+    "teams": 3,
+    "ai_names": [
+      "greedy_flag",
+      "defender",
+      "random"
+    ],
+    "map_width": 25,
+    "map_height": 25,
+    "units_per_team": 3,
+    "jobs": 0,
+    "replay_sample": "none",
+    "scoring": {
+      "weight_win_rate": 0.6,
+      "weight_score_share": 0.25,
+      "weight_kill_ratio": 0.15,
+      "win_rate_prior_matches": 5.0,
+      "baseline_rating": 1000.0,
+      "points_per_decade": 500.0,
+      "min_strength": 0.02,
+      "max_strength": 0.98,
+      "teams": 3
+    }
+  },
+  "warnings": [
+    "--replay-sample none：不会写出 replays/ 目录，单局复盘不可用"
+  ]
+}

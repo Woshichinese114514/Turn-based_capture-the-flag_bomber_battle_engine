@@ -1,0 +1,96 @@
+{
+  "total_matches": 1000,
+  "teams": 3,
+  "rules_version": 1,
+  "map_gen_version": 1,
+  "config": {
+    "weight_win_rate": 0.6,
+    "weight_score_share": 0.25,
+    "weight_kill_ratio": 0.15,
+    "win_rate_prior_matches": 5.0,
+    "baseline_rating": 1000.0,
+    "points_per_decade": 500.0,
+    "min_strength": 0.02,
+    "max_strength": 0.98,
+    "teams": 3
+  },
+  "by_ai_name": [
+    {
+      "ai_name": "greedy_flag",
+      "matches": 1000,
+      "wins": 946,
+      "draws": 54,
+      "losses": 0,
+      "win_rate": 0.946,
+      "draw_rate": 0.054,
+      "avg_score": 10.459,
+      "avg_kills": 0.048,
+      "avg_deaths": 0.162,
+      "avg_ticks": 300.0,
+      "strength": 0.8817561572872564,
+      "rating": 1436.2849829745169
+    },
+    {
+      "ai_name": "defender",
+      "matches": 1000,
+      "wins": 0,
+      "draws": 54,
+      "losses": 946,
+      "win_rate": 0.0,
+      "draw_rate": 0.054,
+      "avg_score": 0.0,
+      "avg_kills": 0.066,
+      "avg_deaths": 0.024,
+      "avg_ticks": 300.0,
+      "strength": 0.08389388434236297,
+      "rating": 480.892260304725
+    },
+    {
+      "ai_name": "random",
+      "matches": 1000,
+      "wins": 0,
+      "draws": 54,
+      "losses": 946,
+      "win_rate": 0.0,
+      "draw_rate": 0.054,
+      "avg_score": 0.001,
+      "avg_kills": 0.096,
+      "avg_deaths": 44.893,
+      "avg_ticks": 300.0,
+      "strength": 0.02,
+      "rating": 154.90195998574313
+    }
+  ],
+  "by_slot": [
+    {
+      "slot": 0,
+      "ai_name": "greedy_flag",
+      "wins": 946,
+      "matches": 1000,
+      "win_rate": 0.946,
+      "rating": 1436.2849829745169
+    },
+    {
+      "slot": 1,
+      "ai_name": "defender",
+      "wins": 0,
+      "matches": 1000,
+      "win_rate": 0.0,
+      "rating": 480.892260304725
+    },
+    {
+      "slot": 2,
+      "ai_name": "random",
+      "wins": 0,
+      "matches": 1000,
+      "win_rate": 0.0,
+      "rating": 154.90195998574313
+    }
+  ],
+  "engine_version": 1,
+  "versions": {
+    "engine_version": 1,
+    "rules_version": 1,
+    "map_gen_version": 1
+  }
+}

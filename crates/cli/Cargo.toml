@@ -1,0 +1,28 @@
+[package]
+name = "cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "批量对局命令行入口：种子模式解析、并行运行、回放导出、manifest/summary/matches 写盘"
+
+[[bin]]
+name = "qfr"
+path = "src/main.rs"
+
+[dependencies]
+protocol.workspace = true
+mapgen.workspace = true
+sim.workspace = true
+ai.workspace = true
+scoring.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+rayon.workspace = true
+clap.workspace = true
+
+[dev-dependencies]
+# 集成测试里跑真实批量流程需要临时目录
+tempfile = "3"

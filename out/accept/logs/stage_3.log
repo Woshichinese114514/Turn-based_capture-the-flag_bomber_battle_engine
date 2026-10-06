@@ -1,0 +1,37 @@
+samples/demo_2p.jsonl: OK-ish  15×15 teams=2 frames=24 versions=(1/1/1) events={'unit_moved': 144, 'move_conflict': 6, 'flag_spawned': 4, 'illegal_action': 10, 'unit_attacked': 10, 'flag_picked': 5, 'bomb_placed': 4, 'unit_died': 5, 'flag_dropped': 2, 'bomb_exploded': 4, 'score': 3, 'unit_respawned': 2}
+out/accept/run2p/replays/match_00000.jsonl: OK-ish  25×25 teams=2 frames=120 versions=(1/1/1) events={'unit_moved': 413, 'bomb_placed': 162, 'bomb_exploded': 159, 'unit_died': 34, 'flag_spawned': 2, 'unit_respawned': 34}
+out/accept/run2p/replays/match_00001.jsonl: OK-ish  25×25 teams=2 frames=120 versions=(1/1/1) events={'unit_moved': 405, 'bomb_placed': 176, 'bomb_exploded': 169, 'unit_died': 37, 'flag_spawned': 2, 'unit_respawned': 35}
+out/accept/run2p/replays/match_00002.jsonl: OK-ish  25×25 teams=2 frames=120 versions=(1/1/1) events={'unit_moved': 475, 'bomb_placed': 149, 'bomb_exploded': 143, 'unit_died': 28, 'flag_spawned': 2, 'unit_respawned': 26}
+out/accept/run2p/replays/match_00003.jsonl: OK-ish  25×25 teams=2 frames=120 versions=(1/1/1) events={'unit_moved': 374, 'bomb_placed': 174, 'bomb_exploded': 170, 'unit_died': 39, 'flag_spawned': 2, 'unit_respawned': 37}
+out/accept/run2p/replays/match_00004.jsonl: OK-ish  25×25 teams=2 frames=120 versions=(1/1/1) events={'unit_moved': 367, 'bomb_placed': 184, 'bomb_exploded': 179, 'flag_spawned': 2, 'unit_died': 41, 'unit_respawned': 38}
+out/accept/run2p/replays/match_00005.jsonl: OK-ish  25×25 teams=2 frames=120 versions=(1/1/1) events={'unit_moved': 404, 'bomb_placed': 177, 'bomb_exploded': 174, 'unit_died': 36, 'flag_spawned': 2, 'unit_respawned': 34}
+out/accept/run2p/replays/match_00006.jsonl: OK-ish  25×25 teams=2 frames=120 versions=(1/1/1) events={'unit_moved': 409, 'bomb_placed': 157, 'bomb_exploded': 155, 'unit_died': 36, 'flag_spawned': 2, 'unit_respawned': 33}
+out/accept/run2p/replays/match_00007.jsonl: OK-ish  25×25 teams=2 frames=120 versions=(1/1/1) events={'unit_moved': 376, 'bomb_placed': 178, 'bomb_exploded': 172, 'unit_died': 39, 'flag_spawned': 2, 'unit_respawned': 37}
+out/accept/run2p/replays/match_00008.jsonl: OK-ish  25×25 teams=2 frames=120 versions=(1/1/1) events={'unit_moved': 395, 'bomb_placed': 175, 'bomb_exploded': 174, 'unit_died': 37, 'flag_spawned': 2, 'unit_respawned': 34}
+out/accept/run2p/replays/match_00009.jsonl: OK-ish  25×25 teams=2 frames=120 versions=(1/1/1) events={'unit_moved': 401, 'bomb_placed': 171, 'bomb_exploded': 169, 'flag_spawned': 2, 'unit_died': 35, 'unit_respawned': 35}
+out/accept/run2p/replays/match_00010.jsonl: OK-ish  25×25 teams=2 frames=120 versions=(1/1/1) events={'unit_moved': 396, 'bomb_placed': 167, 'bomb_exploded': 165, 'flag_spawned': 2, 'unit_died': 38, 'unit_respawned': 34}
+out/accept/run2p/replays/match_00011.jsonl: OK-ish  25×25 teams=2 frames=120 versions=(1/1/1) events={'unit_moved': 414, 'bomb_placed': 168, 'bomb_exploded': 165, 'flag_spawned': 2, 'unit_died': 35, 'unit_respawned': 34}
+out/accept/run3p/replays/match_00000.jsonl: OK-ish  25×25 teams=3 frames=120 versions=(1/1/1) events={'unit_moved': 551, 'bomb_placed': 100, 'bomb_exploded': 99, 'flag_spawned': 3, 'unit_died': 24, 'unit_respawned': 21, 'illegal_action': 2, 'flag_picked': 2, 'unit_attacked': 4, 'flag_dropped': 1}
+out/accept/run3p/replays/match_00001.jsonl: OK-ish  25×25 teams=3 frames=120 versions=(1/1/1) events={'unit_moved': 589, 'bomb_placed': 80, 'bomb_exploded': 77, 'unit_died': 17, 'flag_spawned': 9, 'unit_respawned': 17, 'flag_picked': 8, 'score': 6}
+out/accept/run3p/replays/match_00002.jsonl: OK-ish  25×25 teams=3 frames=120 versions=(1/1/1) events={'unit_moved': 595, 'bomb_placed': 96, 'bomb_exploded': 94, 'unit_died': 18, 'flag_spawned': 3, 'unit_respawned': 16, 'flag_picked': 1}
+out/accept/run3p/replays/match_00003.jsonl: OK-ish  25×25 teams=3 frames=120 versions=(1/1/1) events={'unit_moved': 584, 'bomb_placed': 93, 'bomb_exploded': 89, 'unit_died': 19, 'flag_spawned': 6, 'unit_respawned': 18, 'flag_picked': 5, 'score': 3}
+out/accept/run3p/replays/match_00004.jsonl: OK-ish  25×25 teams=3 frames=120 versions=(1/1/1) events={'unit_moved': 605, 'bomb_placed': 74, 'bomb_exploded': 74, 'unit_died': 17, 'flag_spawned': 9, 'unit_respawned': 16, 'flag_picked': 8, 'score': 6}
+out/accept/run3p/replays/match_00005.jsonl: OK-ish  25×25 teams=3 frames=120 versions=(1/1/1) events={'unit_moved': 607, 'bomb_placed': 69, 'bomb_exploded': 69, 'flag_spawned': 8, 'unit_died': 15, 'flag_picked': 6, 'unit_respawned': 13, 'score': 5}
+
+校验完成：19 个文件，错误 0，警告 0，失败文件 0
+samples/version_mismatch.jsonl:1: ERROR engine_version=99，期望 1
+
+校验完成：1 个文件，错误 1，警告 0，失败文件 1
+提示：错误定义见 docs/replay-format.md（字段表、地形编码、事件表、容错策略）
+samples/malformed.jsonl:2: ERROR 不是合法 JSON：Expecting ',' delimiter
+samples/malformed.jsonl:3: ERROR 缺少 type 字段（应为 init/frame/end）
+samples/malformed.jsonl:4: ERROR 中间行必须是 frame，得到 'weather_report'
+samples/malformed.jsonl:5: ERROR frame 缺少字段 'units'
+samples/malformed.jsonl:5: ERROR frame 缺少字段 'events'
+samples/malformed.jsonl:5: ERROR tick=2 不连续，期望 1（必须从 1 起逐 1 递增）
+samples/malformed.jsonl:5: ERROR units 必须是数组
+samples/malformed.jsonl:5: ERROR events 必须是数组
+
+校验完成：1 个文件，错误 8，警告 2，失败文件 1
+提示：错误定义见 docs/replay-format.md（字段表、地形编码、事件表、容错策略）
+反证通过：version_mismatch 与 malformed 均被验证器判为失败

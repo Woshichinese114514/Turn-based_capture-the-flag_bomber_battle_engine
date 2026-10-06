@@ -1,0 +1,29 @@
+    Finished `release` profile [optimized] target(s) in 0.01s
+     Running `target/release/qfr run --matches 12 --teams 2 --max-ticks 120 --seed-mode fixed-random --base-seed 20240501 --replay-sample all -o out/accept/run2p`
+输出目录：out/accept/run2p
+总局数：12（回放 12 份）  队伍数：2  种子模式：fixed-random
+版本：engine 1 / rules 1 / map_gen 1
+注意：2 队与 3 队的分数属于不同体系，不可直接比较（本批 teams=2）
+
+AI                    局数    胜    平    负        胜率       评分
+random                24    0   24    0     0.000    665.9
+
+槽位     AI                    局数    胜        胜率       评分
+0      random                12    0     0.000    716.5
+1      random                12    0     0.000    716.5
+    Finished `release` profile [optimized] target(s) in 0.01s
+     Running `target/release/qfr run --matches 6 --teams 3 --max-ticks 120 --seed-mode per-match --base-seed 20240501 --ai 0=random --ai 1=greedy_flag --ai 2=defender --replay-sample all -o out/accept/run3p`
+输出目录：out/accept/run3p
+总局数：6（回放 6 份）  队伍数：3  种子模式：per-match
+版本：engine 1 / rules 1 / map_gen 1
+注意：2 队与 3 队的分数属于不同体系，不可直接比较（本批 teams=3）
+
+AI                    局数    胜    平    负        胜率       评分
+greedy_flag            6    4    2    0     0.667   1111.3
+defender               6    0    2    4     0.000    764.9
+random                 6    0    2    4     0.000    670.9
+
+槽位     AI                    局数    胜        胜率       评分
+0      random                 6    0     0.000    670.9
+1      greedy_flag            6    4     0.667   1111.3
+2      defender               6    0     0.000    764.9

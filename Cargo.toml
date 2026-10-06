@@ -1,0 +1,54 @@
+# 抢旗人（Flag Bomb Arena）—— 回合制夺旗炸弹人对战引擎
+#
+# 这是一个 Cargo workspace：把共享协议、地图生成、模拟核心、AI、评分、CLI 拆成独立 crate，
+# 目的是让「模拟核心」保持纯粹（无渲染、无网络、无具体 AI 实现），并且让回放协议成为
+# Rust 端与 Web UI 端之间唯一的耦合点。
+#
+# 依赖方向（单向，见 docs/replay-format.md 与 docs/internal-api.md）：
+#     cli -> sim -> mapgen -> protocol
+#     cli -> ai  -> sim    -> protocol
+#     cli -> scoring -> protocol
+# sim 刻意不依赖 ai：sim 只认识 `sim::ai::TeamAi` trait，具体 AI 由 ai crate 实现、由 cli 注入。
+[workspace]
+resolver = "2"
+members = [
+    "crates/protocol",
+    "crates/mapgen",
+    "crates/sim",
+    "crates/ai",
+    "crates/scoring",
+    "crates/cli",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.82"
+license = "MIT"
+description = "回合制夺旗炸弹人对战引擎（纯逻辑模拟 + 批量对局 + 回放导出）"
+
+[workspace.dependencies]
+# 序列化：回放 JSONL / manifest.json / summary.json / matches.jsonl 全部走 serde。
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# 库层错误类型用 thiserror，CLI 层错误汇总用 anyhow（见编码规范）。
+thiserror = "1"
+anyhow = "1"
+# 批量对局并行：每局独立 RNG + 独立 AI 实例，回放先在内存收集再统一落盘。
+rayon = "1"
+# CLI 参数解析。
+clap = { version = "4", features = ["derive"] }
+
+protocol = { path = "crates/protocol" }
+mapgen = { path = "crates/mapgen" }
+sim = { path = "crates/sim" }
+ai = { path = "crates/ai" }
+scoring = { path = "crates/scoring" }
+
+[profile.release]
+# 批量跑几千局时 debug 信息没必要，开启 LTO 让单局模拟更快。
+lto = "thin"
+codegen-units = 1
+
+[profile.bench]
+inherits = "release"

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# workspace 内可写的 CARGO_HOME 包装器。
+#
+# 为什么需要它：本机（沙箱环境）默认的 $HOME/.cargo 是只读的，cargo 无法在其中写入
+# registry 索引缓存与下载的 crate 源码，会直接报 `Read-only file system (os error 30)`。
+# 把 CARGO_HOME 指到 workspace 内部（本目录的上一级/.cargo-home）即可正常工作。
+#
+# 用法（从任意目录）：
+#     /home/zqh/项目/抢旗人/scripts/cargo test -p sim
+#     ./scripts/cargo run -p cli -- run --matches 10 --out out/demo
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export CARGO_HOME="$ROOT/.cargo-home"
+# target 目录留在 workspace 内（默认行为），避免写到只读的全局位置。
+export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-$ROOT/target}"
+exec cargo "$@"

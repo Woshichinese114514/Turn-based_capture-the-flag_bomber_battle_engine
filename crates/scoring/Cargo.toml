@@ -1,0 +1,13 @@
+[package]
+name = "scoring"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "批量对局评分聚合：把胜率等原始指标映射到 log scale 分数（每 500 分约 10 倍实力）"
+
+[dependencies]
+protocol.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true

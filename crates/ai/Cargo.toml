@@ -1,0 +1,12 @@
+[package]
+name = "ai"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "AI trait 的注册表与基线 AI 实现（random / greedy_flag / defender）"
+
+[dependencies]
+protocol.workspace = true
+sim.workspace = true
+serde.workspace = true

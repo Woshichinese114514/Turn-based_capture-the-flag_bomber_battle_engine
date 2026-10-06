@@ -1,0 +1,12 @@
+[package]
+name = "mapgen"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "带种子与版本号的地图生成（保证同种子同版本产出完全相同的地图）"
+
+[dependencies]
+protocol.workspace = true
+serde.workspace = true
+thiserror.workspace = true

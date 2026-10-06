@@ -1,0 +1,368 @@
+{
+  "ok": true,
+  "url": "file:///home/zqh/项目/抢旗人/webui/index.html?replay=../out/accept/run2p/replays/match_00000.jsonl&tick=30",
+  "out": "out/accept/screenshots/real_2p.png",
+  "bytes": 128271,
+  "ready": true,
+  "warningVisible": false,
+  "bannerDiag": {
+    "present": true,
+    "hidden": true,
+    "opacity": "1",
+    "display": "none",
+    "visibility": "visible",
+    "position": "static",
+    "top": 0,
+    "height": 0,
+    "width": 0,
+    "scrollY": 0,
+    "innerH": 757,
+    "children": 0,
+    "textLen": 0,
+    "parentTag": "BODY",
+    "parentOverflow": "hidden",
+    "parentDisplay": "grid",
+    "bodyH": 757,
+    "mainH": 608,
+    "ulH": null
+  },
+  "status": {
+    "file": "match_00000.jsonl",
+    "ticks": 120,
+    "totalTicks": 120,
+    "teams": 2,
+    "currentTick": 30,
+    "currentIndex": 29,
+    "speed": 1,
+    "playing": false,
+    "warnings": [],
+    "errors": [],
+    "badLines": 0,
+    "map": {
+      "width": 25,
+      "height": 25
+    },
+    "rendered": 6,
+    "error": null
+  },
+  "failures": [],
+  "stderrTail": "DevTools listening on ws://127.0.0.1:40613/devtools/browser/457c1f23-ac7d-42d4-983f-d6b20db34349 / [505:505:1006/181459.159448:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.systemd1.Manager.StartTransientUnit: object_path= /org/freedesktop/systemd1: org.freedesktop.DBus.Error.UnixProcessIdUnknown: Failed to set unit properties: No such process / "
+}
+{
+  "ok": true,
+  "url": "file:///home/zqh/项目/抢旗人/webui/index.html?replay=../samples/demo_2p.jsonl&tick=12",
+  "out": "out/accept/screenshots/demo_2p.png",
+  "bytes": 126565,
+  "ready": true,
+  "warningVisible": false,
+  "bannerDiag": {
+    "present": true,
+    "hidden": true,
+    "opacity": "1",
+    "display": "none",
+    "visibility": "visible",
+    "position": "static",
+    "top": 0,
+    "height": 0,
+    "width": 0,
+    "scrollY": 0,
+    "innerH": 757,
+    "children": 0,
+    "textLen": 0,
+    "parentTag": "BODY",
+    "parentOverflow": "hidden",
+    "parentDisplay": "grid",
+    "bodyH": 757,
+    "mainH": 608,
+    "ulH": null
+  },
+  "status": {
+    "file": "demo_2p.jsonl",
+    "ticks": 24,
+    "totalTicks": 24,
+    "teams": 2,
+    "currentTick": 12,
+    "currentIndex": 11,
+    "speed": 1,
+    "playing": false,
+    "warnings": [],
+    "errors": [],
+    "badLines": 0,
+    "map": {
+      "width": 15,
+      "height": 15
+    },
+    "rendered": 6,
+    "error": null
+  },
+  "failures": [],
+  "stderrTail": "DevTools listening on ws://127.0.0.1:36763/devtools/browser/a36a8487-1241-4b7c-b69f-1bb432c078ad / [670:670:1006/181500.119985:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.systemd1.Manager.StartTransientUnit: object_path= /org/freedesktop/systemd1: org.freedesktop.DBus.Error.UnixProcessIdUnknown: Failed to set unit properties: No such process / "
+}
+{
+  "ok": true,
+  "url": "file:///home/zqh/项目/抢旗人/webui/index.html?replay=../samples/demo_3p.jsonl&tick=12",
+  "out": "out/accept/screenshots/demo_3p.png",
+  "bytes": 125449,
+  "ready": true,
+  "warningVisible": false,
+  "bannerDiag": {
+    "present": true,
+    "hidden": true,
+    "opacity": "1",
+    "display": "none",
+    "visibility": "visible",
+    "position": "static",
+    "top": 0,
+    "height": 0,
+    "width": 0,
+    "scrollY": 0,
+    "innerH": 757,
+    "children": 0,
+    "textLen": 0,
+    "parentTag": "BODY",
+    "parentOverflow": "hidden",
+    "parentDisplay": "grid",
+    "bodyH": 757,
+    "mainH": 608,
+    "ulH": null
+  },
+  "status": {
+    "file": "demo_3p.jsonl",
+    "ticks": 24,
+    "totalTicks": 24,
+    "teams": 3,
+    "currentTick": 12,
+    "currentIndex": 11,
+    "speed": 1,
+    "playing": false,
+    "warnings": [],
+    "errors": [],
+    "badLines": 0,
+    "map": {
+      "width": 15,
+      "height": 15
+    },
+    "rendered": 9,
+    "error": null
+  },
+  "failures": [],
+  "stderrTail": "DevTools listening on ws://127.0.0.1:41849/devtools/browser/8b146f09-0cab-45f8-a0db-59191a010d99 / [835:835:1006/181501.113645:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.systemd1.Manager.StartTransientUnit: object_path= /org/freedesktop/systemd1: org.freedesktop.DBus.Error.UnixProcessIdUnknown: Failed to set unit properties: No such process / "
+}
+{
+  "ok": true,
+  "url": "file:///home/zqh/项目/抢旗人/webui/index.html?replay=../samples/version_mismatch.jsonl&tick=5",
+  "out": "out/accept/screenshots/version_mismatch.png",
+  "bytes": 131776,
+  "ready": true,
+  "warningVisible": true,
+  "bannerDiag": {
+    "present": true,
+    "hidden": false,
+    "opacity": "1",
+    "display": "block",
+    "visibility": "visible",
+    "position": "static",
+    "top": 65,
+    "height": 86,
+    "width": 1440,
+    "scrollY": 0,
+    "innerH": 757,
+    "children": 2,
+    "textLen": 124,
+    "parentTag": "BODY",
+    "parentOverflow": "hidden",
+    "parentDisplay": "grid",
+    "bodyH": 757,
+    "mainH": 607,
+    "ulH": 41
+  },
+  "status": {
+    "file": "version_mismatch.jsonl",
+    "ticks": 24,
+    "totalTicks": 24,
+    "teams": 2,
+    "currentTick": 5,
+    "currentIndex": 4,
+    "speed": 1,
+    "playing": false,
+    "warnings": [
+      "引擎版本 99 高于本查看器已知版本 1，回放可能包含本 UI 不认识的规则/事件；不认识的事件会原样显示，不影响渲染。",
+      "顶层 map_gen_version=1 与 map.map_gen_version=7 不一致。"
+    ],
+    "errors": [],
+    "badLines": 0,
+    "map": {
+      "width": 15,
+      "height": 15
+    },
+    "rendered": 6,
+    "error": null
+  },
+  "failures": [],
+  "stderrTail": "DevTools listening on ws://127.0.0.1:45331/devtools/browser/26a37b63-d7b5-467f-ab64-9b6f3f6653ad / [1002:1002:1006/181502.099199:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.systemd1.Manager.StartTransientUnit: object_path= /org/freedesktop/systemd1: org.freedesktop.DBus.Error.UnixProcessIdUnknown: Failed to set unit properties: No such process / "
+}
+{
+  "ok": true,
+  "url": "file:///home/zqh/项目/抢旗人/webui/index.html?replay=../samples/malformed.jsonl&tick=3",
+  "out": "out/accept/screenshots/malformed.png",
+  "bytes": 142620,
+  "ready": true,
+  "warningVisible": true,
+  "bannerDiag": {
+    "present": true,
+    "hidden": false,
+    "opacity": "1",
+    "display": "block",
+    "visibility": "visible",
+    "position": "static",
+    "top": 85,
+    "height": 86,
+    "width": 1440,
+    "scrollY": 0,
+    "innerH": 757,
+    "children": 2,
+    "textLen": 81,
+    "parentTag": "BODY",
+    "parentOverflow": "hidden",
+    "parentDisplay": "grid",
+    "bodyH": 757,
+    "mainH": 587,
+    "ulH": 41
+  },
+  "status": {
+    "file": "malformed.jsonl",
+    "ticks": 2,
+    "totalTicks": 2,
+    "teams": 2,
+    "currentTick": 3,
+    "currentIndex": 1,
+    "speed": 1,
+    "playing": false,
+    "warnings": [
+      "已忽略 2 行未知类型的行（可能是新协议字段）。",
+      "end.ticks=24 与实际帧数/末帧 tick=3 不一致（文件可能被截断）。"
+    ],
+    "errors": [
+      "已跳过 1 行无法解析的数据（文件可能有损坏），行号：2"
+    ],
+    "badLines": 1,
+    "map": {
+      "width": 15,
+      "height": 15
+    },
+    "rendered": 6,
+    "error": null
+  },
+  "failures": [],
+  "stderrTail": "DevTools listening on ws://127.0.0.1:44635/devtools/browser/9a2d507e-9cf0-4af0-a41e-1eb4d03e8981 / [1170:1170:1006/181503.077842:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.systemd1.Manager.StartTransientUnit: object_path= /org/freedesktop/systemd1: org.freedesktop.DBus.Error.UnixProcessIdUnknown: Failed to set unit properties: No such process / "
+}
+{
+  "ok": true,
+  "url": "file:///home/zqh/项目/抢旗人/webui/index.html?replay=../README.md",
+  "out": "out/accept/screenshots/not_a_replay.png",
+  "bytes": 139370,
+  "ready": true,
+  "warningVisible": true,
+  "bannerDiag": {
+    "present": true,
+    "hidden": false,
+    "opacity": "1",
+    "display": "block",
+    "visibility": "visible",
+    "position": "static",
+    "top": 146,
+    "height": 193,
+    "width": 1440,
+    "scrollY": 0,
+    "innerH": 757,
+    "children": 2,
+    "textLen": 264,
+    "parentTag": "BODY",
+    "parentOverflow": "hidden",
+    "parentDisplay": "grid",
+    "bodyH": 757,
+    "mainH": 334,
+    "ulH": 149
+  },
+  "status": {
+    "file": "README.md",
+    "ticks": 1,
+    "totalTicks": 1,
+    "teams": 0,
+    "currentTick": 1,
+    "currentIndex": 0,
+    "speed": 1,
+    "playing": false,
+    "warnings": [
+      "未找到 init 行（文件开头可能已损坏）：地图尺寸与队伍信息缺失，已按 15×15 空地图兜底渲染。",
+      "地图地形数组长度 0 与 width*height=225 不符，已用空地补齐缺失部分。",
+      "init 缺少 engine_version 字段（回放可能来自旧版本引擎）。",
+      "init 缺少 rules_version 字段。",
+      "init 缺少 map_gen_version 字段，地形编码可能无法正确解释。",
+      "回放里没有任何 frame 行，无法播放逐帧内容。",
+      "回放未提供 end 行，最终结果未知（仍可播放）。"
+    ],
+    "errors": [
+      "已跳过 129 行无法解析的数据（文件可能有损坏），首行行号：1"
+    ],
+    "badLines": 129,
+    "map": {
+      "width": 15,
+      "height": 15
+    },
+    "rendered": 0,
+    "error": null
+  },
+  "failures": [],
+  "stderrTail": "DevTools listening on ws://127.0.0.1:38863/devtools/browser/8c0855d3-542a-45fd-b30d-f9beadad342d / [1336:1336:1006/181504.064339:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.systemd1.Manager.StartTransientUnit: object_path= /org/freedesktop/systemd1: org.freedesktop.DBus.Error.UnixProcessIdUnknown: Failed to set unit properties: No such process / "
+}
+{
+  "ok": true,
+  "url": "file:///home/zqh/项目/抢旗人/webui/index.html?replay=../out/accept/run2p/replays/match_00000.jsonl&tick=30",
+  "out": "out/accept/screenshots/tiny_window.png",
+  "bytes": 22984,
+  "ready": true,
+  "warningVisible": false,
+  "bannerDiag": {
+    "present": true,
+    "hidden": true,
+    "opacity": "1",
+    "display": "none",
+    "visibility": "visible",
+    "position": "static",
+    "top": 0,
+    "height": 0,
+    "width": 0,
+    "scrollY": 0,
+    "innerH": 217,
+    "children": 0,
+    "textLen": 0,
+    "parentTag": "BODY",
+    "parentOverflow": "hidden",
+    "parentDisplay": "grid",
+    "bodyH": 217,
+    "mainH": 0,
+    "ulH": null
+  },
+  "status": {
+    "file": "match_00000.jsonl",
+    "ticks": 120,
+    "totalTicks": 120,
+    "teams": 2,
+    "currentTick": 30,
+    "currentIndex": 29,
+    "speed": 1,
+    "playing": false,
+    "warnings": [],
+    "errors": [],
+    "badLines": 0,
+    "map": {
+      "width": 25,
+      "height": 25
+    },
+    "rendered": 6,
+    "error": null
+  },
+  "failures": [],
+  "stderrTail": "DevTools listening on ws://127.0.0.1:35587/devtools/browser/91c6c977-7ccc-4917-af48-518b46f506c4 / [1501:1501:1006/181505.052765:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.systemd1.Manager.StartTransientUnit: object_path= /org/freedesktop/systemd1: org.freedesktop.DBus.Error.UnixProcessIdUnknown: Failed to set unit properties: No such process / "
+}

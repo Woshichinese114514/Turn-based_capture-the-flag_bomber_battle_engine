@@ -1,0 +1,16 @@
+[package]
+name = "sim"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "游戏模拟核心：回合制结算、冲突判定、炸弹/旗/复活/得分（无 UI、无网络、无具体 AI）"
+
+[dependencies]
+protocol.workspace = true
+mapgen.workspace = true
+thiserror.workspace = true
+serde.workspace = true
+# 回放导出（`ReplayBundle::to_jsonl` 的返回类型就是 serde_json::Error，见 docs/internal-api.md §3）。
+# 这不是新增外部依赖：workspace 里早已有 serde_json（protocol 的 serde 派生测试也在用）。
+serde_json.workspace = true

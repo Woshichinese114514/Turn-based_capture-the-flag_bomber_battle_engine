@@ -1,0 +1,313 @@
+/* =============================================================================
+ * webui/css/style.css —— 暗色主题布局与控件样式
+ * -----------------------------------------------------------------------------
+ * 设计意图：
+ *   · 暗色优先：回放画面（地图/单位）是主体，深色底能让队伍色更突出、长时间看不累。
+ *   · 布局用 CSS Grid：header / notice / main / footer 四行，main 内再分「画布 + 侧栏」。
+ *     main 用 minmax(0,1fr) 防止 canvas 撑破容器（Grid/Flex 的经典坑）。
+ *   · 响应式：窗口变窄时侧栏移到下方；窗口极矮时压缩 header，保证「控制与进度条永不消失」。
+ *   · canvas 用 CSS 撑满容器，实际像素尺寸由 JS 按 devicePixelRatio 设置，避免高分屏糊。
+ * ========================================================================== */
+
+:root {
+  --bg: #0b0f16;
+  --panel: #131a24;
+  --panel-2: #182130;
+  --line: #26313f;
+  --text: #e8edf5;
+  --text-dim: #9aa7bb;
+  --accent: #4aa3ff;
+  --good: #39b54a;
+  --warn: #e6b422;
+  --error: #e35b5b;
+  --radius: 8px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 system-ui, "Noto Sans CJK SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif;
+}
+
+body {
+  display: grid;
+  /* 行数必须与 body 的直接子元素一一对应：
+   *   header / noticeBar / errorBanner / warningBar / main / footer  —— 共 6 个。
+   * 设计意图是「横幅只占自身内容高度，main 吃掉剩余空间」，所以 main 必须是唯一的
+   * `minmax(0, 1fr)` 行，横幅一律 `auto`。
+   *
+   * 这里的行数曾经是 4（header / 横幅组 / main / footer），与实际标记（三条横幅是
+   * 平级兄弟，并没有包在「横幅组」容器里）不符：`display:none` 的横幅不占格子，于是
+   * 「谁落在第 3 行」会随横幅显隐而变——只要出现一条可见横幅，它就会掉进 `1fr` 那一行，
+   * 被压成 19px（内容 63px，被 body 的 overflow:hidden 裁掉），同时 main 被挤到隐式
+   * `auto` 行。外部表现就是「版本不匹配的警告在窗口偏矮时看不见」。实测：1440×900 的
+   * 无头截图里警告条只剩 19px 且一个警示色像素都没有，改成逐行对应后恢复 63px。
+   * 逐行写满 6 行后，无论横幅是否显示，main 恒为 `1fr`、横幅恒为 `auto`，布局不再抖动。 */
+  grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ------------------------------- 顶部 ----------------------------------- */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 14px;
+  background: linear-gradient(180deg, #16202c, #111823);
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 700; letter-spacing: .3px; }
+.brand-mark { color: #ffe066; font-size: 18px; }
+
+.header-meta { display: flex; gap: 14px; flex-wrap: wrap; color: var(--text-dim); font-size: 12.5px; }
+.meta-key { color: #6f7d91; margin-right: 4px; }
+.meta-val { color: var(--text); font-variant-numeric: tabular-nums; }
+
+.header-actions { margin-left: auto; }
+
+/* ------------------------------ 按钮 ------------------------------------ */
+
+.btn {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--text);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background .12s, border-color .12s, transform .05s;
+  white-space: nowrap;
+}
+.btn:hover:not(:disabled) { background: #22314a; border-color: #35507a; }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn:disabled { opacity: .38; cursor: not-allowed; }
+.btn.primary { background: #1d4ed8; border-color: #2b62f5; font-weight: 600; }
+.btn.primary:hover:not(:disabled) { background: #2563eb; }
+.btn.play { background: #14532d; border-color: #1f7a43; font-weight: 600; min-width: 92px; }
+.btn.play.playing { background: #7a4412; border-color: #b06a1f; }
+.btn.tiny { padding: 3px 8px; font-size: 12px; }
+
+/* ---------------------------- 提示 / 横幅 -------------------------------- */
+
+.notice {
+  padding: 7px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--line);
+  background: #14263c;
+  color: #cfe4ff;
+}
+.notice.error { background: #3a1a1c; color: #ffd7d7; }
+.notice.warn { background: #3a3218; color: #ffe9b0; }
+
+.banner { padding: 9px 14px; font-size: 13px; border-bottom: 1px solid var(--line); }
+.banner.error { background: #3a1a1c; color: #ffd7d7; }
+.banner.warn { background: #33290f; color: #ffe9b0; }
+.banner-title { font-weight: 700; margin-bottom: 4px; }
+.banner ul { margin: 0; padding-left: 18px; }
+.banner li { margin: 2px 0; }
+.error-hint { color: #ffb3b3; margin-top: 4px; font-size: 12.5px; }
+
+/* ------------------------------- 主体 ----------------------------------- */
+
+.app-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  min-height: 0;       /* 关键：允许子项收缩，否则 canvas 会把页面撑高 */
+  overflow: hidden;
+}
+
+.stage {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  background: #05070b;
+  border-right: 1px solid var(--line);
+  overflow: hidden;
+}
+.stage.dragging { outline: 3px dashed var(--accent); outline-offset: -6px; }
+
+/* canvas 撑满容器；像素尺寸由 JS 设置（devicePixelRatio 感知） */
+.board { display: block; width: 100%; height: 100%; }
+
+.stage-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  color: #7d8ba0;
+  font-size: 12.5px;
+  pointer-events: none; /* 不挡画布的点击选炸弹 */
+  background: rgba(10, 14, 20, .55);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+.stage-hint code { color: #a9c8ff; }
+
+.stage-zoom { position: absolute; right: 10px; top: 10px; display: flex; gap: 4px; }
+
+/* -------------------------------- 侧栏 ---------------------------------- */
+
+.side {
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+}
+
+.side-block { border-bottom: 1px solid var(--line); padding: 8px 10px 10px; }
+.side-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  color: #c3cfe2;
+  margin-bottom: 6px;
+  position: sticky;
+  top: 0;
+  background: var(--panel);
+  padding: 2px 0;
+  z-index: 1;
+}
+.side-subtitle { font-size: 12px; color: var(--text-dim); margin: 8px 0 4px; }
+.filter { font-size: 12px; font-weight: 400; color: var(--text-dim); display: flex; align-items: center; gap: 4px; }
+.filter select, .tick-input, .jump input {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 3px 6px;
+  font-size: 12.5px;
+}
+
+/* ----------------------------- 事件日志 --------------------------------- */
+
+.log-list { display: flex; flex-direction: column; gap: 3px; max-height: 44vh; overflow-y: auto; }
+.log-row { display: flex; align-items: baseline; gap: 6px; padding: 3px 5px; border-radius: 6px; background: #172030; font-size: 12.5px; }
+.log-tick { color: #708196; font-variant-numeric: tabular-nums; flex: none; }
+.log-icon {
+  flex: none;
+  width: 16px; height: 16px; line-height: 16px; text-align: center;
+  border-radius: 4px; font-size: 10.5px; font-weight: 700;
+  background: #2b3a52; color: #cfe0ff;
+}
+.log-text { color: #dfe8f5; word-break: break-word; }
+.log-row.log-attacked .log-icon { background: #4a2020; color: #ffb0b0; }
+.log-row.log-died .log-icon      { background: #3a1a1a; color: #ffb3b3; }
+.log-row.log-score .log-icon     { background: #14401f; color: #b5f0c0; }
+.log-row.log-boom .log-icon      { background: #4a2a0f; color: #ffd08a; }
+.log-row.log-flag .log-icon      { background: #3a350f; color: #ffe98a; }
+.log-row.log-respawned .log-icon { background: #12343a; color: #a8ecf5; }
+.log-row.log-conflict .log-icon  { background: #42203a; color: #f0b0e0; }
+.log-row.log-illegal .log-icon   { background: #3a2a0f; color: #ffd48a; }
+.log-empty { color: #6f7d91; font-size: 12.5px; padding: 4px 2px; }
+
+/* ----------------------------- 信息面板 --------------------------------- */
+
+.info { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 0; font-size: 12.5px; }
+.info dt { color: var(--text-dim); }
+.info dd { margin: 0; color: var(--text); font-variant-numeric: tabular-nums; word-break: break-all; }
+
+.score-board { display: flex; flex-direction: column; gap: 4px; }
+.score-card {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: #172030;
+  border-left: 4px solid var(--team-color, #888);
+  font-size: 12.5px;
+}
+.score-card.leading { background: #1d2a3d; box-shadow: inset 0 0 0 1px #3d5c8a; font-weight: 700; }
+.score-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--team-color, #888); flex: none; }
+.score-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.score-val { font-variant-numeric: tabular-nums; font-size: 14px; }
+
+.result { margin-top: 8px; padding: 8px; border-radius: 6px; background: #1b2740; font-size: 12.5px; }
+.result-title { font-weight: 700; margin-bottom: 4px; }
+.result-detail { color: #b9c6d8; }
+
+/* ------------------------------- 图例 ----------------------------------- */
+
+.legend-list { list-style: none; margin: 0; padding: 0; font-size: 12px; color: var(--text-dim); }
+.legend-list li { display: flex; align-items: center; gap: 7px; margin: 4px 0; }
+.sw { width: 14px; height: 14px; border-radius: 3px; flex: none; }
+.sw.base { background: rgba(0, 114, 178, .5); border: 2px solid #0072B2; }
+.sw.wall { background: #4e5a6e; border: 1px solid #39424f; }
+.sw.void { background: #05070b; border: 1px solid #26313f; }
+.sw.empty { background: #1b2230; border: 1px solid #2a3446; }
+.sw.center { background: rgba(201, 180, 88, .18); border: 1px dashed #c9b458; }
+.shape { width: 14px; height: 14px; flex: none; }
+.shape.unit { background: #0072B2; border-radius: 3px; border: 2px solid #0072B2; }
+.shape.flag {
+  background: #f2f4f8;
+  clip-path: polygon(20% 100%, 20% 0, 100% 35%, 20% 70%);
+}
+.shape.bomb { background: #f2d024; border-radius: 50%; border: 1px solid #2b1d05; }
+
+/* ------------------------------- 底部 ----------------------------------- */
+
+.app-footer {
+  background: var(--panel);
+  border-top: 1px solid var(--line);
+  padding: 6px 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.progress-row { display: flex; align-items: center; gap: 10px; }
+.progress { flex: 1; accent-color: var(--accent); height: 18px; }
+.status { color: var(--text-dim); font-size: 12px; min-width: 210px; text-align: right; font-variant-numeric: tabular-nums; }
+
+.control-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.btn-group { display: flex; align-items: center; gap: 4px; }
+.jump { display: flex; align-items: center; gap: 5px; color: var(--text-dim); font-size: 12.5px; }
+.tick-input { width: 76px; }
+.tick-total { color: var(--text-dim); font-size: 12px; }
+
+.speed-group {
+  display: flex; align-items: center; gap: 8px;
+  margin: 0; padding: 2px 8px;
+  border: 1px solid var(--line); border-radius: var(--radius);
+}
+.speed-group legend { color: var(--text-dim); font-size: 11.5px; padding: 0 3px; }
+.speed-group label { display: flex; align-items: center; gap: 3px; font-size: 12.5px; cursor: pointer; }
+.speed-group input { accent-color: var(--accent); }
+
+.kbd-hint { margin-left: auto; color: #6f7d91; font-size: 12px; }
+
+/* ---------------------------- 响应式 ------------------------------------ */
+
+/* 窄窗口：侧栏移到画布下方（仍然可滚动），保证画布与控件都在 */
+@media (max-width: 900px) {
+  .app-main { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(200px, 1fr) auto; }
+  .side { border-top: 1px solid var(--line); max-height: 42vh; }
+  .stage { border-right: none; }
+  .log-list { max-height: 24vh; }
+}
+
+/* 极矮窗口：压缩 header 与 footer，保证进度条与控制按钮不被挤掉 */
+@media (max-height: 620px) {
+  .app-header { padding: 4px 10px; }
+  .header-meta { display: none; }
+  .app-footer { padding: 4px 10px; }
+  .kbd-hint { display: none; }
+  .stage-hint { display: none; }
+}
+
+/* 打印/极简模式不是目标场景，这里只保证滚动条不遮内容 */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: #2b3a52; border-radius: 5px; }
+::-webkit-scrollbar-track { background: #101823; }

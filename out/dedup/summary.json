@@ -1,0 +1,58 @@
+{
+  "total_matches": 20,
+  "teams": 2,
+  "rules_version": 1,
+  "map_gen_version": 1,
+  "config": {
+    "weight_win_rate": 0.6,
+    "weight_score_share": 0.25,
+    "weight_kill_ratio": 0.15,
+    "win_rate_prior_matches": 5.0,
+    "baseline_rating": 1000.0,
+    "points_per_decade": 500.0,
+    "min_strength": 0.02,
+    "max_strength": 0.98,
+    "teams": 2
+  },
+  "by_ai_name": [
+    {
+      "ai_name": "random",
+      "matches": 40,
+      "wins": 0,
+      "draws": 40,
+      "losses": 0,
+      "win_rate": 0.0,
+      "draw_rate": 1.0,
+      "avg_score": 0.0,
+      "avg_kills": 0.0,
+      "avg_deaths": 39.475,
+      "avg_ticks": 300.0,
+      "strength": 0.15833333333333333,
+      "rating": 637.2161135850932
+    }
+  ],
+  "by_slot": [
+    {
+      "slot": 0,
+      "ai_name": "random",
+      "wins": 0,
+      "matches": 20,
+      "win_rate": 0.0,
+      "rating": 678.0070598315185
+    },
+    {
+      "slot": 1,
+      "ai_name": "random",
+      "wins": 0,
+      "matches": 20,
+      "win_rate": 0.0,
+      "rating": 678.0070598315185
+    }
+  ],
+  "engine_version": 1,
+  "versions": {
+    "engine_version": 1,
+    "rules_version": 1,
+    "map_gen_version": 1
+  }
+}
