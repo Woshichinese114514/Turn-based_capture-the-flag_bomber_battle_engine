@@ -200,3 +200,10 @@ cli 侧的集成测试在 `crates/cli/tests/`：`seed_modes.rs`（三种种子�
   按 `docs/` 里的契约分工完成：`crates/*`、`webui/*`、`tools/*` 与全部验收脚本）
 - 回放格式契约（`docs/replay-format.md`）与规则文档（`docs/rules.md`）由双方共同冻结，
   任何格式变更都要升版本号并同步两端。
+
+## 作者的话
+- 该项目全权由deepseek-v4.1-flash自主规划建设，作者并未进行代码审查与修改
+- v4.1-flash太快了...
+- 还有不少bug,有待打磨
+- 似乎很适合作为AI的benchmark（指编写这个游戏队伍的AI）
+- 目前DS的AI还有不少bug，诸如停在原地不动、webui的显示也有少许问题
